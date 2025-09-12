@@ -1,0 +1,14 @@
+{
+  "files": [],
+  "references": [
+    { "path": "./tsconfig.app.json" },
+    { "path": "./tsconfig.node.json" }
+  ],
+  "compilerOptions": {
+    "lib": ["es6", "dom"],                  // Include ES6 features and browser DOM APIs
+    "noImplicitAny": true,                  // Error when variables have an implicit 'any' type
+    "noImplicitThis": true,                 // Ensure 'this' has an explicit type
+    "strictNullChecks": true,               // Treat null/undefined as distinct types
+    "allowSyntheticDefaultImports": true    // Allow default imports from modules without a default export
+  }
+}
