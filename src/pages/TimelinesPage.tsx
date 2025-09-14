@@ -1,14 +1,14 @@
 import { useEffect, useState } from "react"
 import api from "../services/config.services"
-import * as React from 'react';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import CardMedia from '@mui/material/CardMedia';
 import Typography from '@mui/material/Typography';
 import CardActionArea from '@mui/material/CardActionArea';
+import { Link } from "react-router";
 
 export interface ITimeline{
-  id: string;
+  _id: string;
   owner: string;
   title: string;
   icon?: string;
@@ -61,8 +61,10 @@ function TimelinesPage() {
         </Typography>
         <div className="flex gap-4 mt-5">
           { userTimelines.map((timeline) => (
-            <Card sx={{ maxWidth: 345 }} key={timeline.id}>
-              <CardActionArea>
+            // {console.log(timeline)}
+            
+            <Card sx={{ maxWidth: 345 }} key={timeline._id}>
+              <CardActionArea component={Link} to={`/timeline/${timeline._id}`}>
                 <CardMedia
                   component="img"
                   height="140"
@@ -89,7 +91,7 @@ function TimelinesPage() {
         </Typography>
         <div className="flex gap-4 mt-5">
           { collaborationTimelines.map((timeline) => (
-            <Card sx={{ maxWidth: 345 }} key={timeline.id}>
+            <Card sx={{ maxWidth: 345 }} key={timeline._id}>
               <CardActionArea>
                 <CardMedia
                   component="img"

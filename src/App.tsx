@@ -1,14 +1,15 @@
 import './App.css'
-import { Routes, Route, Link } from 'react-router'
+import { Routes, Route } from 'react-router'
 import SignUp from "./sign-up/SignUp.tsx"
 import SignIn from "./sign-in/SignIn.tsx"
 
 
-import BorderBox from './components/BorderBox'
-import Footer from './components/Footer'
+// import BorderBox from './components/BorderBox'
+// import Footer from './components/Footer'
 import Navbar from './components/Navbar'
 import OnlyPrivate from './components/OnlyPrivate.tsx'
 import TimelinesPage from './pages/TimelinesPage.tsx'
+import TimelineItemsPage from './pages/TimelineItemsPage.tsx'
 
 // import Link from '@mui/material/Link'
 
@@ -29,6 +30,7 @@ function App() {
             <Routes>
               
               <Route path="/timelines" element={<OnlyPrivate> <TimelinesPage /> </OnlyPrivate> } />
+              <Route path="/timeline/:timelineId" element={<OnlyPrivate> <TimelineItemsPage /> </OnlyPrivate> } />
               <Route path="/sign-up" element={<SignUp />} />
               <Route path="/sign-in" element={<SignIn />} />
 
