@@ -1,6 +1,118 @@
+import { useEffect, useState } from "react"
+import api from "../services/config.services"
+import * as React from 'react';
+import Card from '@mui/material/Card';
+import CardContent from '@mui/material/CardContent';
+import CardMedia from '@mui/material/CardMedia';
+import Typography from '@mui/material/Typography';
+import CardActionArea from '@mui/material/CardActionArea';
+
+export interface ITimeline{
+  id: string;
+  owner: string;
+  title: string;
+  icon?: string;
+  description?: string;
+  startDate?: Date;
+  endDate?: Date;
+  collaborators?: [string];
+  isPublic: Boolean;
+  color?: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 function TimelinesPage() {
+  const [userTimelines, setUserTimelines] = useState<ITimeline[]>([]);
+  const [collaborationTimelines, setCollaborationTimelines] = useState<ITimeline[]>([]);
+
+
+  useEffect(() => {
+    getUserTimelines()
+    getCollaborationTimelines()
+  }, [])
+
+  const getUserTimelines = async () => {
+    try {
+      
+      const response = await api.get("/timelines")
+      // console.log("timelines", response)
+      setUserTimelines(response.data)
+    } catch (error) {
+      console.log(error)
+    }
+  }
+  const getCollaborationTimelines = async () => {
+    try {
+      
+      const response = await api.get("/timelines/collaborations")
+      console.log("timelines collaborations", response)
+      setCollaborationTimelines(response.data)
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
   return (
-    <div>TimelinesPage</div>
+    <>
+      <section className="user-timelines">
+        <Typography variant="h4" component="h2">
+          My timelines
+        </Typography>
+        <div className="flex gap-4 mt-5">
+          { userTimelines.map((timeline) => (
+            <Card sx={{ maxWidth: 345 }} key={timeline.id}>
+              <CardActionArea>
+                <CardMedia
+                  component="img"
+                  height="140"
+                  image={timeline.icon}
+                  alt="Timeline image"
+                />
+                <CardContent>
+                  <Typography gutterBottom variant="h5" component="div">
+                    {timeline.title}
+                  </Typography>
+                  <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                  {timeline.description}
+                  </Typography>
+                </CardContent>
+              </CardActionArea>
+            </Card>
+          ))
+        }
+        </div>
+      </section>
+      <section className="collaboration-timelines">
+        <Typography variant="h4" component="h2">
+          Collaboration timelines
+        </Typography>
+        <div className="flex gap-4 mt-5">
+          { collaborationTimelines.map((timeline) => (
+            <Card sx={{ maxWidth: 345 }} key={timeline.id}>
+              <CardActionArea>
+                <CardMedia
+                  component="img"
+                  height="140"
+                  image={timeline.icon}
+                  alt="Timeline image"
+                />
+                <CardContent>
+                  <Typography gutterBottom variant="h5" component="div">
+                    {timeline.title}
+                  </Typography>
+                  <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                  {timeline.description}
+                  </Typography>
+                </CardContent>
+              </CardActionArea>
+            </Card>
+          ))
+        }
+        </div>
+      </section>
+
+    </>
   )
 }
 export default TimelinesPage
