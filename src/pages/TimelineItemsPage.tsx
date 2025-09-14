@@ -61,7 +61,7 @@ function TimelineItemsPage() {
     <>
     <section className="user-timelines">
         <Typography variant="h4" component="h2">
-          { timelineDetails.title}
+          { timelineDetails?.title}
         </Typography>
         <div className="flex gap-4 mt-5">
           { timelineItems.map((timelineItem) => (
@@ -76,6 +76,9 @@ function TimelineItemsPage() {
                 <CardContent>
                   <Typography gutterBottom variant="h5" component="div">
                     {timelineItem.title}
+                  </Typography>
+                  <Typography variant="body1" sx={{ color: 'text.secondary' }}>
+                    {new Intl.DateTimeFormat("en-GB").format(new Date(timelineItem.startDate))}
                   </Typography>
                   <Typography variant="body2" sx={{ color: 'text.secondary' }}>
                   {timelineItem.description}
