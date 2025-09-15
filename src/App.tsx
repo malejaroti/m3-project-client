@@ -10,6 +10,7 @@ import Navbar from './components/Navbar'
 import OnlyPrivate from './components/OnlyPrivate.tsx'
 import TimelinesPage from './pages/TimelinesPage.tsx'
 import TimelineItemsPage from './pages/TimelineItemsPage.tsx'
+import ErrorPage from './pages/ErrorPage.tsx'
 
 // import Link from '@mui/material/Link'
 
@@ -34,6 +35,7 @@ function App() {
               <Route path="/sign-up" element={<SignUp />} />
               <Route path="/sign-in" element={<SignIn />} />
 
+              <Route path="/error" element={<ErrorPage />} />
               {/* <Route path="/about" element={<AboutPage />} /> */}
 
               {/* <Route path="*" element={<NotFoundPage />} /> */}

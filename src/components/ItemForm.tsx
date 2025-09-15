@@ -18,6 +18,7 @@ import Box from '@mui/material/Box';
 import PhotoCamera from "@mui/icons-material/PhotoCamera";
 import { AuthContext } from '../context/auth.context';
 import ImageUploader from './ImageUploader';
+import CloudinaryImageUploader from './CloudinaryImageUploader';
 
 
 const FormGrid = styled(Grid)(() => ({
@@ -193,6 +194,7 @@ export default function ItemForm(props: ItemFormProps) {
                     </Button>
                 </Box> */}
                 {/* <ImageUploader /> */}
+                <CloudinaryImageUploader />
 
                 {/* <FormGrid >
                     <TextField
