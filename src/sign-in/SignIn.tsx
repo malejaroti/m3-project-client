@@ -125,7 +125,7 @@ export default function SignIn(props: { disableCustomTheme?: boolean }) {
 
       await authenticateUser() // this verifies that the token was correctly stored and is valid. Also it updates the context states.
 
-      // navigate("/timelines")
+      navigate("/timelines")
 
     } catch (error) {
       console.log(error)
