@@ -1,27 +1,25 @@
 // Wrapper component that will only allow pages to display if the user is logged in
 
-import { Navigate } from "react-router"
-import { useContext,  type ReactNode } from "react"
-import { AuthContext } from "../context/auth.context"
+import { Navigate } from 'react-router';
+import { useContext, type ReactNode } from 'react';
+import { AuthContext } from '../context/auth.context';
 
 type OnlyPrivateProps = {
-  children: ReactNode
-}
+  children: ReactNode;
+};
 
-function OnlyPrivate({ children }: OnlyPrivateProps){
-
-const authContext = useContext(AuthContext)
-if (!authContext) {
-    throw new Error('This paged must be used within an AuthWrapper')
+function OnlyPrivate({ children }: OnlyPrivateProps) {
+  const authContext = useContext(AuthContext);
+  if (!authContext) {
+    throw new Error('This paged must be used within an AuthWrapper');
   }
 
-  const { isLoggedIn } = authContext
+  const { isLoggedIn } = authContext;
 
   if (isLoggedIn) {
-    return children 
+    return children;
   } else {
-    return <Navigate to="/login"/>
+    return <Navigate to="/sign-in" />;
   }
-
 }
-export default OnlyPrivate
+export default OnlyPrivate;

@@ -1,21 +1,22 @@
-import { useEffect, useState, Fragment, useCallback } from "react";
-import api from "../services/config.services";
-import { Link, useParams } from "react-router";
+import { useEffect, useState, Fragment, useCallback } from 'react';
+import api from '../services/config.services';
+import { Link, useParams } from 'react-router';
 
-import Card from "@mui/material/Card";
-import CardContent from "@mui/material/CardContent";
-import CardMedia from "@mui/material/CardMedia";
-import Typography from "@mui/material/Typography";
-import CardActionArea from "@mui/material/CardActionArea";
-import type { ITimeline } from "./TimelinesPage";
-import Edit from "@mui/icons-material/Edit";
-import IconButton from "@mui/material/IconButton";
-import Button from "@mui/material/Button";
-import Drawer from "@mui/material/Drawer";
-import ItemForm, { type FormType } from "../components/ItemForm";
+import Card from '@mui/material/Card';
+import CardContent from '@mui/material/CardContent';
+import CardMedia from '@mui/material/CardMedia';
+import Typography from '@mui/material/Typography';
+import CardActionArea from '@mui/material/CardActionArea';
+import type { ITimeline } from './TimelinesPage';
+import Edit from '@mui/icons-material/Edit';
+import IconButton from '@mui/material/IconButton';
+import Button from '@mui/material/Button';
+import Drawer from '@mui/material/Drawer';
+import ItemForm, { type FormType } from '../components/ItemForm';
 
 // Server timeline item model (normalized). Dates are ISO strings; arrays are plain string arrays.
-export interface ITimelineItem { //Full server model
+export interface ITimelineItem {
+  //Full server model
   _id: string;
   timeline: string;
   creator: string;
@@ -36,13 +37,13 @@ export interface ITimelineItem { //Full server model
 // DTO for creating a new item (exclude server-managed fields)
 export type TimelineItemCreateDTO = Omit<
   ITimelineItem,
-  "_id" | "createdAt" | "updatedAt" | "isApproved" | "comments"
+  '_id' | 'createdAt' | 'updatedAt' | 'isApproved' | 'comments'
 >;
 
 // DTO for updating an existing item (partial fields allowed)
 export type TimelineItemUpdateDTO = Partial<TimelineItemCreateDTO>;
 
-type DrawerPosition = "top" | "left" | "bottom" | "right";
+type DrawerPosition = 'top' | 'left' | 'bottom' | 'right';
 interface DrawerState {
   position: DrawerPosition;
   open: boolean;
@@ -55,7 +56,7 @@ function TimelineItemsPage() {
   const { timelineId } = useParams<{ timelineId: string }>();
   const [formType, setFormType] = useState<FormType>(null);
   const [drawerState, setDrawerState] = useState<DrawerState>({
-    position: "right",
+    position: 'right',
     open: false,
   });
 
@@ -67,7 +68,7 @@ function TimelineItemsPage() {
   const getTimelineDetails = async () => {
     try {
       const response = await api.get(`/timelines/${timelineId}`);
-      console.log("timeline details", response);
+      console.log('timeline details', response);
       setTimelineDetails(response.data);
     } catch (error) {
       console.log(error);
@@ -77,7 +78,7 @@ function TimelineItemsPage() {
   const getTimelineItems = async () => {
     try {
       const response = await api.get(`/timelines/${timelineId}/items`);
-      console.log("timeline items", response);
+      console.log('timeline items', response);
       setTimelineItems(response.data);
     } catch (error) {
       console.log(error);
@@ -102,18 +103,18 @@ function TimelineItemsPage() {
   // useCallback keeps handler refs stable so children (e.g. <Button/Drawer>) don’t re-render unnecessarily
   // Without useCallback, a new function would be created on every render, which could cause avoidable updates.
   const openDrawerCreate = useCallback((position: DrawerPosition) => {
-    setFormType("create");
+    setFormType('create');
     setSelectedTimelineItem(null);
     setDrawerState((prev) => ({ ...prev, position, open: true }));
   }, []);
 
   const openDrawerEdit = useCallback(
     (item: ITimelineItem, position: DrawerPosition) => {
-      setFormType("edit");
+      setFormType('edit');
       setSelectedTimelineItem(item);
       setDrawerState((prev) => ({ ...prev, position, open: true }));
     },
-    [],
+    []
   );
 
   const closeDrawer = useCallback(() => {
@@ -145,17 +146,17 @@ function TimelineItemsPage() {
                   <Typography gutterBottom variant="h5" component="div">
                     {timelineItem.title}
                   </Typography>
-                  <Typography variant="body1" sx={{ color: "text.secondary" }}>
-                    {new Intl.DateTimeFormat("en-GB").format(
-                      new Date(timelineItem.startDate),
+                  <Typography variant="body1" sx={{ color: 'text.secondary' }}>
+                    {new Intl.DateTimeFormat('en-GB').format(
+                      new Date(timelineItem.startDate)
                     )}
                   </Typography>
-                  <Typography variant="body2" sx={{ color: "text.secondary" }}>
+                  <Typography variant="body2" sx={{ color: 'text.secondary' }}>
                     {timelineItem.description}
                   </Typography>
                   <IconButton
                     aria-label="Edit item"
-                    onClick={() => openDrawerEdit(timelineItem, "right")}
+                    onClick={() => openDrawerEdit(timelineItem, 'right')}
                     size="small"
                   >
                     <Edit fontSize="small" />
@@ -169,16 +170,16 @@ function TimelineItemsPage() {
         <Button
           variant="contained"
           sx={{
-            position: "absolute",
+            position: 'absolute',
             top: 16, // equivalente a theme.spacing(2)
             right: 16,
-            bgcolor: "primary.main", // use theme's color
-            "&:hover": {
-              bgcolor: "primary.dark",
+            bgcolor: 'primary.main', // use theme's color
+            '&:hover': {
+              bgcolor: 'primary.dark',
             },
           }}
-          onClick={() => openDrawerCreate("right")}
-        // onClick={toggleDrawer('right', true, "create")}
+          onClick={() => openDrawerCreate('right')}
+          // onClick={toggleDrawer('right', true, "create")}
         >
           Add a new moment
         </Button>
@@ -189,16 +190,16 @@ function TimelineItemsPage() {
             open={drawerState.open}
             onClose={closeDrawer}
             sx={{
-              "& .MuiDrawer-paper": {
-                width: { xs: "90%", sm: 500, md: 600 },
+              '& .MuiDrawer-paper': {
+                width: { xs: '90%', sm: 500, md: 600 },
               },
             }}
           >
-            {formType === "create" && timelineId && (
+            {formType === 'create' && timelineId && (
               <ItemForm formType="create" timelineId={timelineId.toString()} />
             )}
 
-            {formType === "edit" && selectedTimelineItem && timelineId && (
+            {formType === 'edit' && selectedTimelineItem && timelineId && (
               <ItemForm
                 formType="edit"
                 item={selectedTimelineItem}

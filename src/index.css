@@ -1,10 +1,8 @@
-@import "tailwindcss";
-
+@import 'tailwindcss';
 
 @theme {
   --color-mint-500: oklch(0.72 0.11 178);
 }
-
 
 /* :root {
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
@@ -75,12 +73,12 @@ button:focus-visible {
   }
 } */
 
-.bb-black{
+.bb-black {
   border: 2px solid black;
 }
-.bb-red{
+.bb-red {
   border: 2px solid red;
 }
-.bb-green{
+.bb-green {
   border: 2px solid green;
 }

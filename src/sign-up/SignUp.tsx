@@ -15,11 +15,13 @@ import MuiCard from '@mui/material/Card';
 import { styled } from '@mui/material/styles';
 import AppTheme from '../shared-theme/AppTheme';
 import ColorModeSelect from '../shared-theme/ColorModeSelect';
-import { GoogleIcon, FacebookIcon, SitemarkIcon } from './components/CustomIcons';
-import api from "../services/config.services";
-import { useNavigate } from "react-router";
-
-
+import {
+  GoogleIcon,
+  FacebookIcon,
+  SitemarkIcon,
+} from './components/CustomIcons';
+import api from '../services/config.services';
+import { useNavigate } from 'react-router';
 
 const Card = styled(MuiCard)(({ theme }) => ({
   display: 'flex',
@@ -71,13 +73,12 @@ export default function SignUp(props: { disableCustomTheme?: boolean }) {
   const [nameError, setNameError] = React.useState(false);
   const [nameErrorMessage, setNameErrorMessage] = React.useState('');
   const [formData, setFormData] = React.useState({
-    name: "",
-    email: "",
-    password: "",
-    username: ""
+    name: '',
+    email: '',
+    password: '',
+    username: '',
   });
-  const navigate = useNavigate()
-
+  const navigate = useNavigate();
 
   const validateInputs = () => {
     const email = document.getElementById('email') as HTMLInputElement;
@@ -115,13 +116,13 @@ export default function SignUp(props: { disableCustomTheme?: boolean }) {
 
     return isValid;
   };
-  const handleOnChange = (event: React.ChangeEvent<HTMLInputElement>)=>{
-    const { name, value} = event.currentTarget;
+  const handleOnChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = event.currentTarget;
     setFormData((prev) => ({
       ...prev,
-      [name]:value
-    }))
-  }
+      [name]: value,
+    }));
+  };
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -139,21 +140,17 @@ export default function SignUp(props: { disableCustomTheme?: boolean }) {
 
     const newUser = {
       name: formData.name,
-      username: formData.name + "username",
+      username: formData.name + 'username',
       email: formData.email,
-      password: formData.password
-    }
+      password: formData.password,
+    };
 
     try {
-      const response = await api.post("/auth/signup", newUser)
-      console.log(response)
-      // navigate("/login")
-      
-    } catch (error) {
-      
-    }
+      const response = await api.post('/auth/signup', newUser);
+      console.log(response);
+      navigate('/sign-in');
+    } catch (error) {}
   };
-
 
   return (
     <AppTheme {...props}>
@@ -205,7 +202,6 @@ export default function SignUp(props: { disableCustomTheme?: boolean }) {
                 color={passwordError ? 'error' : 'primary'}
                 value={formData.email}
                 onChange={handleOnChange}
-
               />
             </FormControl>
             <FormControl>
@@ -262,7 +258,7 @@ export default function SignUp(props: { disableCustomTheme?: boolean }) {
               <Link
                 component="button"
                 type="button"
-                onClick={() => navigate("/sign-in")}
+                onClick={() => navigate('/sign-in')}
                 variant="body2"
                 sx={{ alignSelf: 'center' }}
               >

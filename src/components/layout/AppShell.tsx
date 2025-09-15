@@ -1,5 +1,5 @@
 // AppShell.tsx
-import type { ReactNode } from "react";
+import type { ReactNode } from 'react';
 
 type Props = { children: ReactNode };
 
@@ -10,10 +10,16 @@ export function AppShell({ children }: Props) {
       <aside className="hidden w-64 bg-white dark:bg-gray-800 md:flex md:flex-col shadow-lg">
         <nav className="flex-1 p-4">
           {/* Navigation links */}
-          <a href="/" className="block p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700">
+          <a
+            href="/"
+            className="block p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700"
+          >
             Dashboard
           </a>
-          <a href="/settings" className="block p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700">
+          <a
+            href="/settings"
+            className="block p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700"
+          >
             Settings
           </a>
         </nav>
@@ -23,7 +29,9 @@ export function AppShell({ children }: Props) {
       <div className="flex flex-col flex-1">
         {/* Header */}
         <header className="h-16 flex items-center justify-between px-6 bg-white dark:bg-gray-800 shadow">
-          <h1 className="font-bold text-lg text-gray-800 dark:text-gray-100">My App</h1>
+          <h1 className="font-bold text-lg text-gray-800 dark:text-gray-100">
+            My App
+          </h1>
           {/* user menu, theme toggle, etc. */}
         </header>
 
@@ -34,4 +42,4 @@ export function AppShell({ children }: Props) {
   );
 }
 
-export default AppShell
+export default AppShell;

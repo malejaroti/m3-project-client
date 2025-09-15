@@ -16,10 +16,14 @@ import { styled } from '@mui/material/styles';
 import ForgotPassword from './components/ForgotPassword';
 import AppTheme from '../shared-theme/AppTheme';
 import ColorModeSelect from '../shared-theme/ColorModeSelect';
-import { GoogleIcon, FacebookIcon, SitemarkIcon } from './components/CustomIcons';
-import api from "../services/config.services";
+import {
+  GoogleIcon,
+  FacebookIcon,
+  SitemarkIcon,
+} from './components/CustomIcons';
+import api from '../services/config.services';
 import { AuthContext } from '../context/auth.context';
-import { useNavigate } from "react-router";
+import { useNavigate } from 'react-router';
 
 const Card = styled(MuiCard)(({ theme }) => ({
   display: 'flex',
@@ -64,13 +68,13 @@ const SignInContainer = styled(Stack)(({ theme }) => ({
 }));
 
 export default function SignIn(props: { disableCustomTheme?: boolean }) {
-  const authContext = React.useContext(AuthContext)
+  const authContext = React.useContext(AuthContext);
 
   if (!authContext) {
-    throw new Error('SignIn must be used within an AuthWrapper')
+    throw new Error('SignIn must be used within an AuthWrapper');
   }
 
-  const { authenticateUser } = authContext
+  const { authenticateUser } = authContext;
 
   const [emailError, setEmailError] = React.useState(false);
   const [emailErrorMessage, setEmailErrorMessage] = React.useState('');
@@ -78,10 +82,10 @@ export default function SignIn(props: { disableCustomTheme?: boolean }) {
   const [passwordErrorMessage, setPasswordErrorMessage] = React.useState('');
   const [open, setOpen] = React.useState(false);
   const [formData, setFormData] = React.useState({
-    email: "",
-    password: ""
+    email: '',
+    password: '',
   });
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -95,9 +99,9 @@ export default function SignIn(props: { disableCustomTheme?: boolean }) {
     const { name, value } = event.currentTarget;
     setFormData((prev) => ({
       ...prev,
-      [name]: value
-    }))
-  }
+      [name]: value,
+    }));
+  };
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -112,23 +116,22 @@ export default function SignIn(props: { disableCustomTheme?: boolean }) {
     // });
     const userCredentials = {
       email: formData.email,
-      password: formData.password
-    }
-    console.log("user credentials", userCredentials)
+      password: formData.password,
+    };
+    console.log('user credentials', userCredentials);
     try {
-      const response = await api.post("/auth/login", userCredentials)
-      console.log("login response", response)
+      const response = await api.post('/auth/login', userCredentials);
+      console.log('login response', response);
 
       //* the user is now authenticated
 
-      localStorage.setItem("authToken", response.data.authToken)
+      localStorage.setItem('authToken', response.data.authToken);
 
-      await authenticateUser() // this verifies that the token was correctly stored and is valid. Also it updates the context states.
+      await authenticateUser(); // this verifies that the token was correctly stored and is valid. Also it updates the context states.
 
-      navigate("/timelines")
-
+      navigate('/timelines');
     } catch (error) {
-      console.log(error)
+      console.log(error);
       //   if (error.response && error.response.status === 400 ) {
       //     setErrorMessage(error.response.data.errorMessage)
       //   } else {
@@ -168,7 +171,9 @@ export default function SignIn(props: { disableCustomTheme?: boolean }) {
     <AppTheme {...props}>
       <CssBaseline enableColorScheme />
       <SignInContainer direction="column" justifyContent="space-between">
-        <ColorModeSelect sx={{ position: 'fixed', top: '1rem', right: '1rem' }} />
+        <ColorModeSelect
+          sx={{ position: 'fixed', top: '1rem', right: '1rem' }}
+        />
         <Card variant="outlined">
           <SitemarkIcon />
           <Typography
@@ -273,15 +278,15 @@ export default function SignIn(props: { disableCustomTheme?: boolean }) {
             </Button>
             <Typography sx={{ textAlign: 'center' }}>
               Don&apos;t have an account?{' '}
-                <Link
+              <Link
                 component="button"
                 type="button"
-                onClick={() => navigate("/sign-up")}
+                onClick={() => navigate('/sign-up')}
                 variant="body2"
                 sx={{ alignSelf: 'center' }}
-                >
+              >
                 Sign up
-                </Link>
+              </Link>
             </Typography>
           </Box>
         </Card>

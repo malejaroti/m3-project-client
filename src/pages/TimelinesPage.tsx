@@ -1,11 +1,11 @@
-import { useEffect, useState } from "react";
-import api from "../services/config.services";
-import Card from "@mui/material/Card";
-import CardContent from "@mui/material/CardContent";
-import CardMedia from "@mui/material/CardMedia";
-import Typography from "@mui/material/Typography";
-import CardActionArea from "@mui/material/CardActionArea";
-import { Link } from "react-router";
+import { useEffect, useState } from 'react';
+import api from '../services/config.services';
+import Card from '@mui/material/Card';
+import CardContent from '@mui/material/CardContent';
+import CardMedia from '@mui/material/CardMedia';
+import Typography from '@mui/material/Typography';
+import CardActionArea from '@mui/material/CardActionArea';
+import { Link } from 'react-router';
 
 export interface ITimeline {
   _id: string;
@@ -35,7 +35,7 @@ function TimelinesPage() {
 
   const getUserTimelines = async () => {
     try {
-      const response = await api.get("/timelines");
+      const response = await api.get('/timelines');
       // console.log("timelines", response)
       setUserTimelines(response.data);
     } catch (error) {
@@ -44,8 +44,8 @@ function TimelinesPage() {
   };
   const getCollaborationTimelines = async () => {
     try {
-      const response = await api.get("/timelines/collaborations");
-      console.log("timelines collaborations", response);
+      const response = await api.get('/timelines/collaborations');
+      console.log('timelines collaborations', response);
       setCollaborationTimelines(response.data);
     } catch (error) {
       console.log(error);
@@ -74,7 +74,7 @@ function TimelinesPage() {
                   <Typography gutterBottom variant="h5" component="div">
                     {timeline.title}
                   </Typography>
-                  <Typography variant="body2" sx={{ color: "text.secondary" }}>
+                  <Typography variant="body2" sx={{ color: 'text.secondary' }}>
                     {timeline.description}
                   </Typography>
                 </CardContent>
@@ -101,7 +101,7 @@ function TimelinesPage() {
                   <Typography gutterBottom variant="h5" component="div">
                     {timeline.title}
                   </Typography>
-                  <Typography variant="body2" sx={{ color: "text.secondary" }}>
+                  <Typography variant="body2" sx={{ color: 'text.secondary' }}>
                     {timeline.description}
                   </Typography>
                 </CardContent>

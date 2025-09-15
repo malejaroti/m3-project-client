@@ -1,22 +1,19 @@
-import './App.css'
-import { Routes, Route } from 'react-router'
-import SignUp from "./sign-up/SignUp.tsx"
-import SignIn from "./sign-in/SignIn.tsx"
-
+import './App.css';
+import { Routes, Route } from 'react-router';
+import SignUp from './sign-up/SignUp.tsx';
+import SignIn from './sign-in/SignIn.tsx';
 
 // import BorderBox from './components/BorderBox'
 // import Footer from './components/Footer'
-import Navbar from './components/Navbar'
-import OnlyPrivate from './components/OnlyPrivate.tsx'
-import TimelinesPage from './pages/TimelinesPage.tsx'
-import TimelineItemsPage from './pages/TimelineItemsPage.tsx'
-import ErrorPage from './pages/ErrorPage.tsx'
+import Navbar from './components/Navbar';
+import OnlyPrivate from './components/OnlyPrivate.tsx';
+import TimelinesPage from './pages/TimelinesPage.tsx';
+import TimelineItemsPage from './pages/TimelineItemsPage.tsx';
+import ErrorPage from './pages/ErrorPage.tsx';
 
 // import Link from '@mui/material/Link'
 
-
 function App() {
-
   return (
     <>
       <div className="flex min-h-screen bg-white-500">
@@ -26,12 +23,27 @@ function App() {
           <Navbar />
 
           {/* Main container */}
-          <main className='w-full flex-1 bb-red'>
+          <main className="w-full flex-1 bb-red">
             {/* <div className='central-section bb-black h-full w-[50%] m-auto'> */}
             <Routes>
-              
-              <Route path="/timelines" element={<OnlyPrivate> <TimelinesPage /> </OnlyPrivate> } />
-              <Route path="/timeline/:timelineId" element={<OnlyPrivate> <TimelineItemsPage /> </OnlyPrivate> } />
+              <Route
+                path="/timelines"
+                element={
+                  <OnlyPrivate>
+                    {' '}
+                    <TimelinesPage />{' '}
+                  </OnlyPrivate>
+                }
+              />
+              <Route
+                path="/timeline/:timelineId"
+                element={
+                  <OnlyPrivate>
+                    {' '}
+                    <TimelineItemsPage />{' '}
+                  </OnlyPrivate>
+                }
+              />
               <Route path="/sign-up" element={<SignUp />} />
               <Route path="/sign-in" element={<SignIn />} />
 
@@ -51,10 +63,9 @@ function App() {
         </div>
         {/* Main page */}
         {/* Footer */}
-
       </div>
     </>
-  )
+  );
 }
 
-export default App
+export default App;

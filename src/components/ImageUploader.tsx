@@ -1,15 +1,15 @@
 // ImageUploader.tsx
-import { useEffect, useId, useMemo, useRef, useState } from "react";
-import Box from "@mui/material/Box";
-import Button from "@mui/material/Button";
-import Card from "@mui/material/Card";
-import CardActions from "@mui/material/CardActions";
-import CardContent from "@mui/material/CardContent";
-import CardMedia from "@mui/material/CardMedia";
-import Stack from "@mui/material/Stack";
-import Typography from "@mui/material/Typography";
-import PhotoCamera from "@mui/icons-material/PhotoCamera";
-import DeleteOutline from "@mui/icons-material/DeleteOutline";
+import { useEffect, useId, useMemo, useRef, useState } from 'react';
+import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
+import Card from '@mui/material/Card';
+import CardActions from '@mui/material/CardActions';
+import CardContent from '@mui/material/CardContent';
+import CardMedia from '@mui/material/CardMedia';
+import Stack from '@mui/material/Stack';
+import Typography from '@mui/material/Typography';
+import PhotoCamera from '@mui/icons-material/PhotoCamera';
+import DeleteOutline from '@mui/icons-material/DeleteOutline';
 
 type ImageUploaderProps = {
   onFileSelect?: (file: File | null) => void;
@@ -22,8 +22,8 @@ type ImageUploaderProps = {
 export default function ImageUploader({
   onFileSelect,
   maxSizeMB = 5,
-  accepted = "image/*",
-  label = "Upload image",
+  accepted = 'image/*',
+  label = 'Upload image',
 }: ImageUploaderProps) {
   const inputId = useId();
   const inputRef = useRef<HTMLInputElement | null>(null);
@@ -32,8 +32,8 @@ export default function ImageUploader({
   const [isUploading, setIsUploading] = useState(false); // for a loading animation effect
 
   const previewUrl = useMemo(
-    () => (file ? URL.createObjectURL(file) : ""),
-    [file],
+    () => (file ? URL.createObjectURL(file) : ''),
+    [file]
   );
 
   useEffect(() => {
@@ -44,12 +44,12 @@ export default function ImageUploader({
 
   const handleSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const f = e.target.files?.[0];
-    console.log("file selected: ", f);
+    console.log('file selected: ', f);
     if (!f) return;
 
     // Basic validation
-    if (!f.type.startsWith("image/")) {
-      setError("The selected file is not an image.");
+    if (!f.type.startsWith('image/')) {
+      setError('The selected file is not an image.');
       resetFileInput();
       return;
     }
@@ -68,13 +68,11 @@ export default function ImageUploader({
   const resetFileInput = () => {
     setFile(null);
     onFileSelect?.(null);
-    if (inputRef.current) inputRef.current.value = ""; // allow re-selecting the same file
+    if (inputRef.current) inputRef.current.value = ''; // allow re-selecting the same file
   };
 
-  
-
   return (
-    <Stack spacing={2} sx={{ alignSelf: "center" }}>
+    <Stack spacing={2} sx={{ alignSelf: 'center' }}>
       <Box>
         <input
           id={inputId}
@@ -82,7 +80,7 @@ export default function ImageUploader({
           type="file"
           accept={accepted}
           onChange={handleSelect}
-          style={{ display: "none" }}
+          style={{ display: 'none' }}
         />
         <label htmlFor={inputId}>
           <Button
@@ -91,7 +89,7 @@ export default function ImageUploader({
             color="primary"
             startIcon={<PhotoCamera />}
           >
-            {file ? "Change image" : label}
+            {file ? 'Change image' : label}
           </Button>
         </label>
         {file && (
@@ -119,7 +117,7 @@ export default function ImageUploader({
             component="img"
             image={previewUrl}
             alt={file.name}
-            sx={{ aspectRatio: "16 / 9", objectFit: "cover" }}
+            sx={{ aspectRatio: '16 / 9', objectFit: 'cover' }}
           />
           <CardContent>
             <Typography variant="subtitle1" fontWeight={600}>
