@@ -226,10 +226,6 @@ export default function SignUp(props: { disableCustomTheme?: boolean }) {
                 onChange={handleOnChange}
               />
             </FormControl>
-            <FormControlLabel
-              control={<Checkbox value="allowExtraEmails" color="primary" />}
-              label="I want to receive updates via email."
-            />
             <Button
               type="submit"
               fullWidth
@@ -244,6 +240,7 @@ export default function SignUp(props: { disableCustomTheme?: boolean }) {
           </Divider>
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
             <Button
+              disabled
               fullWidth
               variant="outlined"
               onClick={() => alert('Sign up with Google')}
@@ -252,6 +249,7 @@ export default function SignUp(props: { disableCustomTheme?: boolean }) {
               Sign up with Google
             </Button>
             <Button
+              disabled
               fullWidth
               variant="outlined"
               onClick={() => alert('Sign up with Facebook')}
@@ -262,7 +260,9 @@ export default function SignUp(props: { disableCustomTheme?: boolean }) {
             <Typography sx={{ textAlign: 'center' }}>
               Already have an account?{' '}
               <Link
-                href="/material-ui/getting-started/templates/sign-in/"
+                component="button"
+                type="button"
+                onClick={() => navigate("/sign-in")}
                 variant="body2"
                 sx={{ alignSelf: 'center' }}
               >

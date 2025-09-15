@@ -218,7 +218,7 @@ export default function SignIn(props: { disableCustomTheme?: boolean }) {
                 type="password"
                 id="password"
                 autoComplete="current-password"
-                autoFocus
+                // autoFocus
                 required
                 fullWidth
                 variant="outlined"
@@ -227,10 +227,10 @@ export default function SignIn(props: { disableCustomTheme?: boolean }) {
                 onChange={handleOnChange}
               />
             </FormControl>
-            <FormControlLabel
+            {/* <FormControlLabel
               control={<Checkbox value="remember" color="primary" />}
               label="Remember me"
-            />
+            /> */}
             <ForgotPassword open={open} handleClose={handleClose} />
             <Button
               type="submit"
@@ -240,27 +240,30 @@ export default function SignIn(props: { disableCustomTheme?: boolean }) {
             >
               Sign in
             </Button>
-            <Link
+            {/* <Link
               component="button"
               type="button"
               onClick={handleClickOpen}
               variant="body2"
-              sx={{ alignSelf: 'center' }}
+              sx={{ alignSelf: 'center'}}
+              disabled // not supported natively by Link component
             >
               Forgot your password?
-            </Link>
+            </Link> */}
           </Box>
           <Divider>or</Divider>
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
             <Button
               fullWidth
               variant="outlined"
+              disabled
               onClick={() => alert('Sign in with Google')}
               startIcon={<GoogleIcon />}
             >
               Sign in with Google
             </Button>
             <Button
+              disabled
               fullWidth
               variant="outlined"
               onClick={() => alert('Sign in with Facebook')}
@@ -270,13 +273,15 @@ export default function SignIn(props: { disableCustomTheme?: boolean }) {
             </Button>
             <Typography sx={{ textAlign: 'center' }}>
               Don&apos;t have an account?{' '}
-              <Link
-                href="/material-ui/getting-started/templates/sign-in/"
+                <Link
+                component="button"
+                type="button"
+                onClick={() => navigate("/sign-up")}
                 variant="body2"
                 sx={{ alignSelf: 'center' }}
-              >
+                >
                 Sign up
-              </Link>
+                </Link>
             </Typography>
           </Box>
         </Card>
