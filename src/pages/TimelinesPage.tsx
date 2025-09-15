@@ -1,57 +1,56 @@
-import { useEffect, useState } from "react"
-import api from "../services/config.services"
-import Card from '@mui/material/Card';
-import CardContent from '@mui/material/CardContent';
-import CardMedia from '@mui/material/CardMedia';
-import Typography from '@mui/material/Typography';
-import CardActionArea from '@mui/material/CardActionArea';
+import { useEffect, useState } from "react";
+import api from "../services/config.services";
+import Card from "@mui/material/Card";
+import CardContent from "@mui/material/CardContent";
+import CardMedia from "@mui/material/CardMedia";
+import Typography from "@mui/material/Typography";
+import CardActionArea from "@mui/material/CardActionArea";
 import { Link } from "react-router";
 
-export interface ITimeline{
+export interface ITimeline {
   _id: string;
   owner: string;
   title: string;
   icon?: string;
   description?: string;
-  startDate?: Date;
-  endDate?: Date;
-  collaborators?: [string];
-  isPublic: Boolean;
+  startDate?: string;
+  endDate?: string;
+  collaborators?: string[];
+  isPublic: boolean;
   color?: string;
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt: string;
+  updatedAt: string;
 }
 
 function TimelinesPage() {
   const [userTimelines, setUserTimelines] = useState<ITimeline[]>([]);
-  const [collaborationTimelines, setCollaborationTimelines] = useState<ITimeline[]>([]);
-
+  const [collaborationTimelines, setCollaborationTimelines] = useState<
+    ITimeline[]
+  >([]);
 
   useEffect(() => {
-    getUserTimelines()
-    getCollaborationTimelines()
-  }, [])
+    getUserTimelines();
+    getCollaborationTimelines();
+  }, []);
 
   const getUserTimelines = async () => {
     try {
-      
-      const response = await api.get("/timelines")
+      const response = await api.get("/timelines");
       // console.log("timelines", response)
-      setUserTimelines(response.data)
+      setUserTimelines(response.data);
     } catch (error) {
-      console.log(error)
+      console.log(error);
     }
-  }
+  };
   const getCollaborationTimelines = async () => {
     try {
-      
-      const response = await api.get("/timelines/collaborations")
-      console.log("timelines collaborations", response)
-      setCollaborationTimelines(response.data)
+      const response = await api.get("/timelines/collaborations");
+      console.log("timelines collaborations", response);
+      setCollaborationTimelines(response.data);
     } catch (error) {
-      console.log(error)
+      console.log(error);
     }
-  }
+  };
 
   return (
     <>
@@ -60,9 +59,9 @@ function TimelinesPage() {
           My timelines
         </Typography>
         <div className="flex gap-4 mt-5">
-          { userTimelines.map((timeline) => (
+          {userTimelines.map((timeline) => (
             // {console.log(timeline)}
-            
+
             <Card sx={{ maxWidth: 345 }} key={timeline._id}>
               <CardActionArea component={Link} to={`/timeline/${timeline._id}`}>
                 <CardMedia
@@ -75,14 +74,13 @@ function TimelinesPage() {
                   <Typography gutterBottom variant="h5" component="div">
                     {timeline.title}
                   </Typography>
-                  <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                  {timeline.description}
+                  <Typography variant="body2" sx={{ color: "text.secondary" }}>
+                    {timeline.description}
                   </Typography>
                 </CardContent>
               </CardActionArea>
             </Card>
-          ))
-        }
+          ))}
         </div>
       </section>
       <section className="collaboration-timelines">
@@ -90,7 +88,7 @@ function TimelinesPage() {
           Collaboration timelines
         </Typography>
         <div className="flex gap-4 mt-5">
-          { collaborationTimelines.map((timeline) => (
+          {collaborationTimelines.map((timeline) => (
             <Card sx={{ maxWidth: 345 }} key={timeline._id}>
               <CardActionArea>
                 <CardMedia
@@ -103,18 +101,16 @@ function TimelinesPage() {
                   <Typography gutterBottom variant="h5" component="div">
                     {timeline.title}
                   </Typography>
-                  <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                  {timeline.description}
+                  <Typography variant="body2" sx={{ color: "text.secondary" }}>
+                    {timeline.description}
                   </Typography>
                 </CardContent>
               </CardActionArea>
             </Card>
-          ))
-        }
+          ))}
         </div>
       </section>
-
     </>
-  )
+  );
 }
-export default TimelinesPage
+export default TimelinesPage;
