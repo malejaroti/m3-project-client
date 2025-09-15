@@ -1,42 +1,33 @@
-import Checkbox from '@mui/material/Checkbox';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import FormLabel from '@mui/material/FormLabel';
-import Grid from '@mui/material/Grid';
-import OutlinedInput from '@mui/material/OutlinedInput';
-import { styled } from '@mui/material/styles';
-import Button from '@mui/material/Button';
-import type { ITimelineItem } from '../pages/TimelineItemsPage';
-import { useContext, useState } from 'react';
-import TextField from '@mui/material/TextField';
-import Typography from '@mui/material/Typography';
-import dayjs, { Dayjs } from 'dayjs';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-import FormGroup from '@mui/material/FormGroup';
-import Box from '@mui/material/Box';
-import PhotoCamera from "@mui/icons-material/PhotoCamera";
-import { AuthContext } from '../context/auth.context';
-import ImageUploader from './ImageUploader';
-import CloudinaryImageUploader from './CloudinaryImageUploader';
+import Checkbox from "@mui/material/Checkbox";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import FormLabel from "@mui/material/FormLabel";
+import Grid from "@mui/material/Grid";
+import OutlinedInput from "@mui/material/OutlinedInput";
+import Button from "@mui/material/Button";
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
+import { styled } from "@mui/material/styles";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+// import TextField from "@mui/material/TextField";
+// import FormGroup from "@mui/material/FormGroup";
+// import PhotoCamera from "@mui/icons-material/PhotoCamera";
+
+import React, { useContext, useState } from "react";
+import type { ITimelineItem, TimelineItemCreateDTO } from "../pages/TimelineItemsPage";
+import { AuthContext } from "../context/auth.context";
+import ImageUploader from "./ImageUploader";
+import CloudinaryImageUploader from "./CloudinaryImageUploader";
+import api from "../services/config.services";
+import { useNavigate } from "react-router";
+import dayjs, { Dayjs } from "dayjs";
 
 
 const FormGrid = styled(Grid)(() => ({
-    display: 'flex',
-    flexDirection: 'column',
+  display: "flex",
+  flexDirection: "column",
 }));
-
-const VisuallyHiddenInput = styled('input')({
-    clip: 'rect(0 0 0 0)',
-    clipPath: 'inset(50%)',
-    height: 1,
-    overflow: 'hidden',
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    whiteSpace: 'nowrap',
-    width: 1,
-});
 
 export type FormType = "edit" | "create" | null; //union
 
@@ -46,16 +37,16 @@ type ItemFormProps =
   | { formType: "edit"; item: ITimelineItem; timelineId: string };
 
 export default function ItemForm(props: ItemFormProps) {
-    const authContext = useContext(AuthContext)
+  const authContext = useContext(AuthContext);
+  if (!authContext) {
+    throw new Error("Item creation must be done within an AuthWrapper");
+  }
+  const { loggedUserId } = authContext;
 
-    if (!authContext) {
-        throw new Error('Item creation must be done within an AuthWrapper')
-    }
-    const { loggedUserId } = authContext
-
-    const defaultFormData = {
-    creator: loggedUserId,
-    kind: "",
+  const defaultFormData: TimelineItemCreateDTO = {
+    creator: loggedUserId !== null ? loggedUserId : "",
+    timeline: props.timelineId,
+    // kind: "",
     title: "",
     description: "",
     startDate: "",
@@ -63,166 +54,202 @@ export default function ItemForm(props: ItemFormProps) {
     images: [],
     impact: "",
     tags: [],
-    isApproved: true,
-    comments: [],
-    };
+  };
 
-    // const editFormData = {
-    // _id: item._id,
-    // timeline: item.timeline,
-    // creator: item.creator,
-    // kind: item.kind,
-    // title: item.title,
-    // description: item.description,
-    // startDate: item.startDate,
-    // endDate: item.endDate,
-    // images: item.images,
-    // impact: item.impact,
-    // tags: item.tags,
-    // isApproved: item.isApproved,
-    // comments: item.comments,
-    // createdAt: item.createdAt,
-    // updatedAt: item.updatedAt,
-    // };
-
-    const [formData, setFormData] = useState(
+  const [formData, setFormData] = useState<TimelineItemCreateDTO>(
     props.formType === "edit" && props.item
-        ? { ...props.item }
-        : { ...defaultFormData, timeline: props.timelineId }
-    );
+      ? { ...props.item }
+      : { ...defaultFormData },
+  );
+  // console.log("props.item: ", props.item)
+  const [file, setFile] = useState<File | null>(null);
+  const [isUploading, setIsUploading] = useState(false); // for a loading animation effect while image uploads to cloudinary and URL is generated
+  const [startDateValue, setStartDateValue] = useState<Dayjs | null>(
+    props.formType === "edit" && props.item?.startDate
+      ? dayjs(props.item.startDate)
+      : dayjs()
+  );
+  const [endDateValue, setEndDateValue] = useState<Dayjs | null>(
+    props.formType === "edit" && props.item?.endDate
+      ? dayjs(props.item.endDate)
+      : dayjs()
+  );
+  const [allDayEvent, setAllDayEvent] = useState(formData.startDate === formData.endDate);
+  const navigate = useNavigate();
 
-    const [dateValue, setDateValue] = useState<Dayjs | null>(dayjs());
-    const [allDayEvent, setAllDayEvent] = useState(formData.startDate === formData.endDate);
+  const handleFormDataChange = (
+    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => {
+    const { name, value } = event.currentTarget;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
 
-    return (
-        <main className='m-5'>
-            <Typography gutterBottom variant="h4" component="div">
-                {props.formType === "create"? "Add a new item" : "Edit item"} 
-            </Typography>
-            <Grid container spacing={3}>
-                <FormGrid size={{ xs: 12, md: 6 }}>
-                    <FormLabel htmlFor="first-name" required>
-                        Item title
-                    </FormLabel>
-                    <OutlinedInput
-                        id="title"
-                        name="title"
-                        type="name"
-                        placeholder="Title"
-                        autoComplete="first name"
-                        required
-                        size="small"
-                        value={formData.title}
-                    />
-                </FormGrid>
+  const handleFileUpload = async (file: File) => {
+    console.log("The file to be uploaded is: ", file);
+    setIsUploading(true); // to start the loading animation
+    const uploadData = new FormData(); // images and other files need to be sent to the backend in a FormData
+    uploadData.append("image", file);
+    console.log("The upload data to be passed to Backend is: ", uploadData);
 
-                <FormGrid size={{ xs: 12 }}>
-                    <FormLabel htmlFor="description" required>
-                        Description
-                    </FormLabel>
-                    <OutlinedInput
-                        id="description"
-                        name="description"
-                        type="description"
-                        placeholder="Item description"
-                        autoComplete="shipping address-line1"
-                        required
-                        size="small"
-                        value={formData.description}
-                        multiline
-                    />
-                </FormGrid>
-                <FormGrid>
-                    <FormLabel htmlFor="start-date" required>
-                        Start Date
-                    </FormLabel>
-                    <LocalizationProvider dateAdapter={AdapterDayjs}>
-                        <DatePicker
-                            // label="Start date"
-                            value={formData.startDate ? dayjs(formData.startDate) : null}
-                            onChange={(newValue) => setDateValue(newValue)}
-                            slotProps={{ textField: { fullWidth: true, id: 'start-date' } }}
-                        />
-                    </LocalizationProvider>
-                    <FormControlLabel control={<Checkbox
-                        checked={allDayEvent}
-                        onChange={(event, checked) => setAllDayEvent(checked)}
-                    // sx={allDayEvent ? { display: "inline-block" } : { display: "none" }}
-                    />}
-                        label="One day event"
-                    />
-                </FormGrid>
-                {
-                    !allDayEvent &&
-                    <FormGrid>
-                        <FormLabel htmlFor="end-date" required>
-                            End Date
-                        </FormLabel>
-                        <LocalizationProvider dateAdapter={AdapterDayjs}>
-                            <DatePicker
-                                // label="End date"
-                                value={formData.endDate ? dayjs(formData.endDate) : null}
-                                onChange={(newValue) => setDateValue(newValue)}
-                                slotProps={{ textField: { fullWidth: true, id:'end-date'} }}
-                            />
-                        </LocalizationProvider>
-                    </FormGrid>
-                }
+    try {
+      const response = await api.post("/upload", uploadData);
+      // backend sends the image to the frontend => res.json({ imageUrl: req.file.path });
+      console.log("response to POST upload: ", response);
+      setIsUploading(false); // to stop the loading animation
+      setFormData(
+        {
+          ...formData,
+          images: [...formData.images, response.data.imageUrl] // add new file
+        }
+      )
+    } catch (error) {
+      navigate("/error");
+    }
+  };
+  const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault()
+    if (file !== null) {
+      handleFileUpload(file)
+    }
+    const newItem = {
+      ...formData,
+      startDate: startDateValue ? startDateValue.format('YYYY-MM-DD') : '',
+      endDate: allDayEvent
+        ? (startDateValue ? startDateValue.format('YYYY-MM-DD') : '')
+        : (endDateValue ? endDateValue.format('YYYY-MM-DD') : ''),
+      impact: "positive"
+    };
+    console.log("new item: ", newItem)
+    isUploading 
+    try {
+      const response = api.post(`/timelines/${formData.timeline}/items`, newItem);
+      console.log("Res POST new item: ", response);
+    } catch (error) { 
+      navigate("/error");
+    }
+  };
 
-                {/* <Box
-                    component="form"
-                    sx={{
-                        display: "flex",
-                        flexDirection: "column",
-                        alignItems: "center",
-                        marginTop: { xs: 2, sm: 5, md: 10 },
-                    }}
-                >
-                    <Button
-                        component="label"
-                        role={undefined}
-                        variant="contained"
-                        tabIndex={-1}
-                        startIcon={<PhotoCamera />}
-                    >
-                        Upload cover picture
-                        <VisuallyHiddenInput
-                            type="file"
-                            onChange={(event) => console.log(event.target.files)}
-                            multiple
-                        />
-                    </Button>
-                </Box> */}
-                {/* <ImageUploader /> */}
-                <CloudinaryImageUploader />
+  return (
+    <main className="m-5">
+      <Typography gutterBottom variant="h4" component="div">
+        {props.formType === "create" ? "Add a new item" : "Edit item"}
+      </Typography>
+      <Grid container spacing={3}>
+        <FormGrid size={{ xs: 12, md: 6 }}>
+          <FormLabel htmlFor="first-name" required>
+            Item title
+          </FormLabel>
+          <OutlinedInput
+            id="title"
+            name="title"
+            type="name"
+            placeholder="Title"
+            autoComplete="item title"
+            required
+            size="small"
+            value={formData.title}
+            onChange={handleFormDataChange}
+          />
+        </FormGrid>
 
-                {/* <FormGrid >
-                    <TextField
-                        
-                        required
-                        multiline
-                        id="outlined-required"
-                        label="Moment title"
-                        defaultValue="Hello World"
-                        value={formData.description}
-                    />
-                </FormGrid> */}
+        <FormGrid size={{ xs: 12 }}>
+          <FormLabel htmlFor="description" required>
+            Description
+          </FormLabel>
+          <OutlinedInput
+            id="description"
+            name="description"
+            type="description"
+            placeholder="Item description"
+            autoComplete="description"
+            required
+            size="small"
+            multiline
+            value={formData.description}
+            onChange={handleFormDataChange}
+          />
+        </FormGrid>
+        <FormGrid>
+          <FormLabel htmlFor="start-date" required>
+            {allDayEvent ? "Date" : "Start Date"}
+          </FormLabel>
+          <LocalizationProvider dateAdapter={AdapterDayjs}>
+            <DatePicker
+              // label="Start date"
+              name="startDate"
+              value={startDateValue}
+              onChange={(newValue) => setStartDateValue(newValue)}
+              // onChange={handleFormDataChange}
+              slotProps={{ textField: { fullWidth: true, id: "start-date" } }}
+            />
+          </LocalizationProvider>
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={allDayEvent}
+                onChange={(_event, checked) => setAllDayEvent(checked)}
+              // sx={allDayEvent ? { display: "inline-block" } : { display: "none" }}
+              />
+            }
+            label="One day event"
+          />
+        </FormGrid>
+        {!allDayEvent && (
+          <FormGrid>
+            <FormLabel htmlFor="end-date" required>
+              End Date
+            </FormLabel>
+            <LocalizationProvider dateAdapter={AdapterDayjs}>
+              <DatePicker
+                // label="End date"
+                name="EndDate"
+                value={endDateValue}
+                onChange={(newValue) => setEndDateValue(newValue)}
+                slotProps={{ textField: { fullWidth: true, id: "end-date" } }}
+              // sx={allDayEvent ? { display: "inline-block" } : { display: "none" }}
+              />
+            </LocalizationProvider>
+          </FormGrid>
+        )}
+        <FormGrid size={{ xs: 12 }}>
+          <ImageUploader
+            onFileSelect={setFile}
+          />
+        </FormGrid>
+        {/* <FormGrid >
+              <TextField
+                  
+                  required
+                  multiline
+                  id="outlined-required"
+                  label="Moment title"
+                  defaultValue="Hello World"
+                  value={formData.description}
+              />
+          </FormGrid> */}
+      </Grid>
 
-            </Grid>
-{/* 
-            <Box
-                component="form"
-                sx={{
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "center",
-                    marginTop: { xs: 2, sm: 5, md: 10 },
-                }}
-            >
-                <Button variant="contained" type="submit" size='medium'>
-                    Save changes
-                </Button>
-            </Box> */}
-        </main>
-    );
+      <Box
+        component="form"
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          marginTop: { xs: 2, sm: 5, md: 10 },
+        }}
+      >
+        <Button
+          variant="contained"
+          type="submit"
+          size="medium"
+          onClick={handleSubmit}
+        >
+          {props.formType === "create" ? "Create item" : "Save changes"}
+        </Button>
+      </Box>
+    </main>
+  );
 }
