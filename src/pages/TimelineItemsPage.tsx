@@ -16,6 +16,21 @@ import Drawer from '@mui/material/Drawer';
 import ItemForm, { type FormType } from '../components/ItemForm';
 import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
+import Backdrop from '@mui/material/Backdrop';
+import Modal from '@mui/material/Modal';
+import Fade from '@mui/material/Fade';
+
+const styleModalBox = {
+  position: 'absolute',
+  top: '50%',
+  left: '50%',
+  transform: 'translate(-50%, -50%)',
+  width: 400,
+  bgcolor: 'background.paper',
+  border: '2px solid #000',
+  boxShadow: 24,
+  p: 4,
+};
 
 // Server timeline item model (normalized). Dates are ISO strings; arrays are plain string arrays.
 export interface ITimelineItem {
@@ -61,6 +76,9 @@ function TimelineItemsPage() {
     position: 'right',
     open: false,
   });
+  const [openModal, setOpenModal] = useState(false);
+  const handleModalOpen = () => setOpenModal(true);
+  const handleModalClose = () => setOpenModal(false);
   const navigate = useNavigate()
 
   useEffect(() => {
@@ -125,14 +143,18 @@ function TimelineItemsPage() {
   }, []);
 
 
-  const handleItemDelete = async (item: ITimelineItem) => {
-    console.log("Timeline Details: ", { timelineDetails })
-    console.log("Timeline Id (params): ", { timelineId })
+  const handleClickOnTrashIcon = (item: ITimelineItem) => {
+    setSelectedTimelineItem(item)
+    setOpenModal(true)
+  }
+
+  const handleItemDelete = async () => {
+
     try {
-      // const response = await api.delete(`/timelines/${timelineDetails?._id}/items/${item}`);
-      const response = await api.delete(`/timelines/${timelineId}/items/${item._id}`);
+      const response = await api.delete(`/timelines/${timelineId}/items/${selectedTimelineItem?._id}`);
       console.log('Res DELETE item: ', response);
       getTimelineItems()
+      setOpenModal(false)
     } catch (error) {
       navigate('/error');
     }
@@ -220,7 +242,7 @@ function TimelineItemsPage() {
                     </IconButton>
                     <IconButton
                       aria-label="Delete item"
-                      onClick={() => handleItemDelete(timelineItem)}
+                      onClick={() => handleClickOnTrashIcon(timelineItem)}
                       size="small"
                       sx={{
                         alignSelf: 'flex-end',
@@ -286,6 +308,42 @@ function TimelineItemsPage() {
               />
             )}
           </Drawer>
+          <Modal
+              aria-labelledby="transition-modal-title"
+              aria-describedby="transition-modal-description"
+              open={openModal}
+              onClose={()=> setOpenModal(close)}
+              closeAfterTransition
+              slots={{ backdrop: Backdrop }}
+              slotProps={{
+                backdrop: {
+                  timeout: 500,
+                },
+              }}
+            >
+              <Fade in={openModal}>
+                <Box sx={styleModalBox} className='flex flex-col gap-5'>
+                  <div>
+                  <Typography id="transition-modal-title" variant="h6" component="h2">
+                    Are you sure?
+                  </Typography>
+                  <Typography id="transition-modal-description" sx={{ mt: 2 }}>
+                    Are you sure you want to delete this item?
+                    This action cannot be undone.
+                  </Typography>
+                  </div>
+
+                  <div className='flex gap-10 '>
+                    <Button variant='outlined' onClick={()=> setOpenModal(false)}>Cancel</Button>
+                    <Button variant='contained' onClick={handleItemDelete}>Delete</Button>
+                  </div>
+                  {/* <Box>
+                    <Button>Cancel</Button>
+                    <Button>Delete</Button>
+                  </Box> */}
+                </Box>
+              </Fade>
+            </Modal>
         </div>
       </main>
     </>
