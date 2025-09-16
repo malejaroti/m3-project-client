@@ -5,6 +5,7 @@ import Typography from '@mui/material/Typography';
 import { styled } from '@mui/material/styles';
 import Button from '@mui/material/Button';
 
+
 // Styled component for responsive navigation links
 const NavLink = styled(Link)(() => ({
   textDecoration: 'none',
@@ -39,14 +40,14 @@ const LogoutButton = styled('button')(() => ({
 
 // Responsive font sizes for navbar links
 const navLinkStyles = {
-  fontSize: { xs: '1rem', sm: '1.1rem', md: '1.5rem' },
+  fontSize: { xs: '1rem', sm: '1.1rem', md: '1.2rem' },
   fontWeight: 500
 };
 
 // Special styles for logout button text
 const logoutButtonTextStyles = {
   ...navLinkStyles,
-  color: 'white', // Ensure text is always white on the button
+  color: 'blue', // Ensure text is always white on the button
 };
 
 function Navbar() {
@@ -122,7 +123,7 @@ function Navbar() {
         {/* Right side - Logout button */}
         {isLoggedIn && (
           <Button variant='outlined' onClick={handleLogout}>
-            <Typography variant="h6" sx={logoutButtonTextStyles}>
+            <Typography variant="h6">
               Logout
             </Typography>
           </Button>

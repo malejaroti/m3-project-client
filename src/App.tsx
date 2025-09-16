@@ -10,6 +10,7 @@ import OnlyPrivate from './components/OnlyPrivate.tsx';
 import TimelinesPage from './pages/TimelinesPage.tsx';
 import TimelineItemsPage from './pages/TimelineItemsPage.tsx';
 import ErrorPage from './pages/ErrorPage.tsx';
+import Home from './pages/Home.tsx';
 
 // import Link from '@mui/material/Link'
 
@@ -26,13 +27,10 @@ function App() {
           <main className="w-full flex-1 bb-red">
             {/* <div className='central-section bb-black h-full w-[50%] m-auto'> */}
             <Routes>
-              <Route
-                path="/timelines"
-                element={
-                  <OnlyPrivate>
-                    {' '}
-                    <TimelinesPage />{' '}
-                  </OnlyPrivate>
+              <Route path="/timelines" 
+                      element={ <OnlyPrivate> {' '}
+                                  <TimelinesPage />{' '}
+                                </OnlyPrivate>
                 }
               />
               <Route
@@ -44,6 +42,7 @@ function App() {
                   </OnlyPrivate>
                 }
               />
+              <Route path="/" element={<Home />} />
               <Route path="/sign-up" element={<SignUp />} />
               <Route path="/sign-in" element={<SignIn />} />
 
