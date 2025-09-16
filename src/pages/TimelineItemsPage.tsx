@@ -196,21 +196,24 @@ function TimelineItemsPage() {
             {timelineItems.map((timelineItem) => (
               <Card sx={{ maxWidth: 300, display: 'flex', flexDirection: 'column' }} key={timelineItem._id} className='p-5'>
                 {/* <CardActionArea> */}
-                <CardMedia
-                  component="img"
-                  image={
-                    timelineItem.images && timelineItem.images.length > 0
-                      ? timelineItem.images[0]
-                      : undefined
-                  }
-                  alt="Timeline image"
-                  sx={{
-                    minHeight: 400,
-                    objectFit: 'cover', //contain
-                    backgroundColor: '#f5f5f5',
-                    padding: '2px 10px'
-                  }}
-                />
+                { timelineItem.images.length !== 0 ? 
+                  <CardMedia
+                    component="img"
+                    image={
+                      timelineItem.images && timelineItem.images.length > 0
+                        ? timelineItem.images[0]
+                        : undefined
+                    }
+                    alt="Timeline image"
+                    sx={{
+                      minHeight: 400,
+                      objectFit: 'cover', //contain
+                      backgroundColor: '#f5f5f5',
+                      padding: '2px 10px'
+                    }}
+                  />
+                  : ""
+                }
                 <CardContent sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }} className="">
                   <Typography gutterBottom variant="h5" component="div">
                     {timelineItem.title}
