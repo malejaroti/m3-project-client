@@ -39,8 +39,12 @@ function LifeTimeline() {
                 const startDate = new Date(item.startDate);
                 let endDate: Date | undefined;
 
-                // Handle one-day events: if no endDate or same as startDate, make it a full day block
-                if (!item.endDate || item.startDate === item.endDate) {
+
+                if (!item.endDate) {
+                    endDate = new Date();
+                }
+                // Handle one-day events: if no endDate is same as startDate, make it a full day block
+                else if (item.startDate === item.endDate) {
                     endDate = new Date(startDate);
                     endDate.setDate(endDate.getDate() + 1); // Add one day to make it a block
                 } else {
@@ -50,7 +54,7 @@ function LifeTimeline() {
                 return {
                     ...item,
                     id: item._id, // Map MongoDB _id to vis-timeline id
-                    content: item.title,
+                    content: `<div>${item.title}</div>${item.images && item.images.length > 0 ? `<img src="${item.images[0]}" style="width:32px; height:32px; border-radius: 4px; margin-top: 4px;">` : ''}`,
                     start: startDate,
                     end: endDate,
                     group: timelineIndex + 1, // Each timeline gets its own group
