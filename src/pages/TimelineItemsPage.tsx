@@ -299,7 +299,7 @@ function TimelineItemsPage() {
               {/* <FleetTimeline items={timelineItems} timelineTitle={timelineDetails?.title} /> */}
               <SimplerTimelineWidget items={newArr} title={timelineDetails?.title ?? 'test'}/>
         </section>
-        <AddButton handleOnClick={() => setDrawerState((prev) => ({ ...prev, open: true}))} buttonLabel='Add new item'/>
+        <AddButton handleOnClick={() => openDrawerCreate('right')} buttonLabel='Add new item' />
         
 
         <div>
