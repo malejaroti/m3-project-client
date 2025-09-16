@@ -1,4 +1,4 @@
-import { useEffect, useState, Fragment, useCallback } from 'react';
+import { useEffect, useState, Fragment, useCallback, useMemo } from 'react';
 import api from '../services/config.services';
 import { Link, useNavigate, useParams } from 'react-router';
 
@@ -19,6 +19,12 @@ import Box from '@mui/material/Box';
 import Backdrop from '@mui/material/Backdrop';
 import Modal from '@mui/material/Modal';
 import Fade from '@mui/material/Fade';
+
+import TimelineWidget, { type VisTimelineItem } from "../components/vis-timeline/VisTimelineWidget"
+import FleetTimeline from "../components/vis-timeline/FleetTimeline";
+import SimplerTimelineWidget from '../components/vis-timeline/simplerTimelineGptEx';
+
+
 
 const styleModalBox = {
   position: 'absolute',
@@ -79,6 +85,9 @@ function TimelineItemsPage() {
   const [openModal, setOpenModal] = useState(false);
   const handleModalOpen = () => setOpenModal(true);
   const handleModalClose = () => setOpenModal(false);
+
+  const [selected, setSelected] = useState<(string | number)[]>([]);
+
   const navigate = useNavigate()
 
   useEffect(() => {
@@ -159,6 +168,15 @@ function TimelineItemsPage() {
       navigate('/error');
     }
   }
+  let newArr = timelineItems.map((item, index)=> (
+    { id:index,
+      content: item.title,
+      start: item.startDate,
+      end: item.startDate === item.endDate? "": item.endDate ,
+      group: timelineDetails?.title
+    }
+  ))
+  // console.log("array items for timeline widget:", newArr)
 
   return (
     <>
@@ -190,7 +208,7 @@ function TimelineItemsPage() {
                     minHeight: 400,
                     objectFit: 'cover', //contain
                     backgroundColor: '#f5f5f5',
-                    padding:'2px 10px'
+                    padding: '2px 10px'
                   }}
                 />
                 <CardContent sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }} className="">
@@ -259,6 +277,27 @@ function TimelineItemsPage() {
             ))}
           </div>
         </section>
+        {/* <section>
+          <h2>Timeline</h2>
+          <TimelineWidget
+              items={[...items]}
+              // items={[...items, ...groupedItems]}
+              // groups={groups}
+              options={{
+                  // Example: focus initial window
+                  start: "2025-08-10",
+                  end: "2025-09-10",
+                  tooltip: { followMouse: true },
+              }}
+              onSelectIds={setSelected}
+          />
+          <p>Selected IDs: {selected.join(", ") || "none"}</p>
+        </section> */}
+        <section>
+          <h1>Timeline simpler</h1>
+              {/* <FleetTimeline items={timelineItems} timelineTitle={timelineDetails?.title} /> */}
+              <SimplerTimelineWidget items={newArr} title={timelineDetails?.title ?? 'test'}/>
+        </section>
         <Button
           variant="contained"
           size='large'
@@ -273,7 +312,6 @@ function TimelineItemsPage() {
             },
           }}
           onClick={() => openDrawerCreate('right')}
-        // onClick={toggleDrawer('right', true, "create")}
         >
           Add a new item
         </Button>
@@ -309,21 +347,21 @@ function TimelineItemsPage() {
             )}
           </Drawer>
           <Modal
-              aria-labelledby="transition-modal-title"
-              aria-describedby="transition-modal-description"
-              open={openModal}
-              onClose={()=> setOpenModal(false)}
-              closeAfterTransition
-              slots={{ backdrop: Backdrop }}
-              slotProps={{
-                backdrop: {
-                  timeout: 500,
-                },
-              }}
-            >
-              <Fade in={openModal}>
-                <Box sx={styleModalBox} className='flex flex-col gap-5'>
-                  <div>
+            aria-labelledby="transition-modal-title"
+            aria-describedby="transition-modal-description"
+            open={openModal}
+            onClose={() => setOpenModal(false)}
+            closeAfterTransition
+            slots={{ backdrop: Backdrop }}
+            slotProps={{
+              backdrop: {
+                timeout: 500,
+              },
+            }}
+          >
+            <Fade in={openModal}>
+              <Box sx={styleModalBox} className='flex flex-col gap-5'>
+                <div>
                   <Typography id="transition-modal-title" variant="h6" component="h2">
                     Are you sure?
                   </Typography>
@@ -331,19 +369,19 @@ function TimelineItemsPage() {
                     Are you sure you want to delete this item?
                     This action cannot be undone.
                   </Typography>
-                  </div>
+                </div>
 
-                  <div className='flex gap-10 '>
-                    <Button variant='outlined' onClick={()=> setOpenModal(false)}>Cancel</Button>
-                    <Button variant='contained' onClick={handleItemDelete}>Delete</Button>
-                  </div>
-                  {/* <Box>
+                <div className='flex gap-10 '>
+                  <Button variant='outlined' onClick={() => setOpenModal(false)}>Cancel</Button>
+                  <Button variant='contained' onClick={handleItemDelete}>Delete</Button>
+                </div>
+                {/* <Box>
                     <Button>Cancel</Button>
                     <Button>Delete</Button>
                   </Box> */}
-                </Box>
-              </Fade>
-            </Modal>
+              </Box>
+            </Fade>
+          </Modal>
         </div>
       </main>
     </>
