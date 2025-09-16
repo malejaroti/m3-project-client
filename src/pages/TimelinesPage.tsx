@@ -1,10 +1,6 @@
 import { useEffect, useState } from 'react';
 import api from '../services/config.services';
-import Card from '@mui/material/Card';
-import CardContent from '@mui/material/CardContent';
-import CardMedia from '@mui/material/CardMedia';
 import Typography from '@mui/material/Typography';
-import CardActionArea from '@mui/material/CardActionArea';
 import { Link } from 'react-router';
 import TimelineCard from '../components/TimelineCard';
 import Button from '@mui/material/Button';

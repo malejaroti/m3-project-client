@@ -24,6 +24,7 @@ import TimelineWidget, { type VisTimelineItem } from "../components/vis-timeline
 import FleetTimeline from "../components/vis-timeline/FleetTimeline";
 import SimplerTimelineWidget from '../components/vis-timeline/simplerTimelineGptEx';
 import AddButton from '../components/AddButton';
+import DeleteModal from '../components/DeleteModal';
 
 
 
@@ -84,9 +85,6 @@ function TimelineItemsPage() {
     open: false,
   });
   const [openModal, setOpenModal] = useState(false);
-  const handleModalOpen = () => setOpenModal(true);
-  const handleModalClose = () => setOpenModal(false);
-
   const [selected, setSelected] = useState<(string | number)[]>([]);
 
   const navigate = useNavigate()
@@ -169,11 +167,12 @@ function TimelineItemsPage() {
       navigate('/error');
     }
   }
-  let newArr = timelineItems.map((item, index)=> (
-    { id:index,
+  let newArr = timelineItems.map((item, index) => (
+    {
+      id: index,
       content: item.title,
       start: item.startDate,
-      end: item.startDate === item.endDate? "": item.endDate ,
+      end: item.startDate === item.endDate ? "" : item.endDate,
       group: timelineDetails?.title
     }
   ))
@@ -295,12 +294,12 @@ function TimelineItemsPage() {
           <p>Selected IDs: {selected.join(", ") || "none"}</p>
         </section> */}
         <section>
-          <h1>Timeline simpler</h1>
-              {/* <FleetTimeline items={timelineItems} timelineTitle={timelineDetails?.title} /> */}
-              <SimplerTimelineWidget items={newArr} title={timelineDetails?.title ?? 'test'}/>
+          {/* <h1>Timeline simpler</h1> */}
+          {/* <FleetTimeline items={timelineItems} timelineTitle={timelineDetails?.title} /> */}
+          {/* <SimplerTimelineWidget items={newArr} title={timelineDetails?.title ?? 'test'}/> */}
         </section>
         <AddButton handleOnClick={() => openDrawerCreate('right')} buttonLabel='Add new item' />
-        
+
 
         <div>
           <Drawer
@@ -368,6 +367,7 @@ function TimelineItemsPage() {
               </Box>
             </Fade>
           </Modal>
+          {/* <DeleteModal modalState={openModal}  modalStateSetter={setOpenModal} handleDelete={handleItemDelete}/> */}
         </div>
       </main>
     </>
