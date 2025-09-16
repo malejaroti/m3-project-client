@@ -1,6 +1,34 @@
 import { useContext } from 'react';
 import { Link, useNavigate } from 'react-router';
 import { AuthContext } from '../context/auth.context';
+import Typography from '@mui/material/Typography';
+import { styled } from '@mui/material/styles';
+
+// Styled component for responsive navigation links
+const NavLink = styled(Link)(() => ({
+  textDecoration: 'none',
+  color: 'inherit',
+  '&:hover': {
+    opacity: 0.8,
+  },
+}));
+
+// Styled component for logout button
+const LogoutButton = styled('button')(() => ({
+  background: 'none',
+  border: 'none',
+  cursor: 'pointer',
+  color: 'inherit',
+  '&:hover': {
+    opacity: 0.8,
+  },
+}));
+
+// Responsive font sizes for navbar links
+const navLinkStyles = {
+  fontSize: { xs: '1rem', sm: '1.1rem', md: '1.5rem' },
+  fontWeight: 500
+};
 
 function Navbar() {
   const navigate = useNavigate();
@@ -27,21 +55,55 @@ function Navbar() {
   };
 
   return (
-    <nav className="w-full border-2 justify-center items-center  border-mint-500 bg-amber-200">
-      <ul className="flex justify-around border-2">
+    <nav className="w-full border-2 justify-center items-center border-mint-500 bg-amber-200">
+      <ul className="flex justify-around border-2 items-center py-2">
         {/* public links */}
-        <Link to="/">Home</Link>
+        <li>
+          <NavLink to="/">
+            <Typography variant="h6" sx={navLinkStyles}>
+              Home
+            </Typography>
+          </NavLink>
+        </li>
 
         {/* anon links */}
-        {!isLoggedIn && <Link to={'/sign-up'}>Sign up </Link>}
-        {!isLoggedIn && <Link to={'/sign-in'}>Sign in </Link>}
+        {!isLoggedIn && (
+          <li>
+            <NavLink to={'/sign-up'}>
+              <Typography variant="h6" sx={navLinkStyles}>
+                Sign up
+              </Typography>
+            </NavLink>
+          </li>
+        )}
+        {!isLoggedIn && (
+          <li>
+            <NavLink to={'/sign-in'}>
+              <Typography variant="h6" sx={navLinkStyles}>
+                Sign in
+              </Typography>
+            </NavLink>
+          </li>
+        )}
 
         {/* private links */}
-        {isLoggedIn && <Link to={'/timelines'}>Timelines</Link>}
         {isLoggedIn && (
-          <button onClick={handleLogout} className="text-blue-500 underline">
-            Logout
-          </button>
+          <li>
+            <NavLink to={'/timelines'}>
+              <Typography variant="h6" sx={navLinkStyles}>
+                Timelines
+              </Typography>
+            </NavLink>
+          </li>
+        )}
+        {isLoggedIn && (
+          <li>
+            <LogoutButton onClick={handleLogout}>
+              <Typography variant="h6" sx={navLinkStyles}>
+                Logout
+              </Typography>
+            </LogoutButton>
+          </li>
         )}
       </ul>
     </nav>
