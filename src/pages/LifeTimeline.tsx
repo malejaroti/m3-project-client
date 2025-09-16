@@ -26,6 +26,7 @@ function LifeTimeline() {
     const itemsDSRef = useRef<DataSet<VisTimelineItem> | null>(null);
     const groupsDSRef = useRef<DataSet<DataGroup> | null>(null);
     const rootsMapRef = useRef<Map<Element, Root>>(new Map());
+    const isItemImageVisible = false
 
     const navigate = useNavigate()
 
@@ -54,7 +55,7 @@ function LifeTimeline() {
                 return {
                     ...item,
                     id: item._id, // Map MongoDB _id to vis-timeline id
-                    content: `<div>${item.title}</div>${item.images && item.images.length > 0 ? `<img src="${item.images[0]}" style="width:32px; height:32px; border-radius: 4px; margin-top: 4px;">` : ''}`,
+                    content: `<div>${item.title}</div>${isItemImageVisible && item.images && item.images.length > 0 ? `<img src="${item.images[0]}" style="width:32px; height:32px; border-radius: 4px; margin-top: 4px;">` : ''}`,
                     start: startDate,
                     end: endDate,
                     group: timelineIndex + 1, // Each timeline gets its own group
@@ -155,7 +156,7 @@ function LifeTimeline() {
         <>
             <Typography variant="h3">My Life Timeline</Typography>
             <div
-                className="master-timeline border mt-5 h-[calc(100vh-250px)]"
+                className="master-timeline border mt-5 h-[calc(100vh-250px)] overflow-y-scroll"
                 ref={masterTimelineContainerRef}
                 style={{ width: "100%", minHeight: "600px" }}
             />
