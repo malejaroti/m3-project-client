@@ -6,6 +6,7 @@ import CardMedia from '@mui/material/CardMedia';
 import Typography from '@mui/material/Typography';
 import CardActionArea from '@mui/material/CardActionArea';
 import { Link } from 'react-router';
+import TimelineCard from '../components/TimelineCard';
 
 export interface ITimeline {
   _id: string;
@@ -58,28 +59,10 @@ function TimelinesPage() {
         <Typography variant="h4" component="h2">
           My timelines
         </Typography>
-        <div className="flex gap-4 mt-5">
+        <div className="flex gap-4 mt-5 border">
           {userTimelines.map((timeline) => (
             // {console.log(timeline)}
-
-            <Card sx={{ maxWidth: 345 }} key={timeline._id}>
-              <CardActionArea component={Link} to={`/timeline/${timeline._id}`}>
-                <CardMedia
-                  component="img"
-                  height="140"
-                  image={timeline.icon}
-                  alt="Timeline image"
-                />
-                <CardContent>
-                  <Typography gutterBottom variant="h5" component="div">
-                    {timeline.title}
-                  </Typography>
-                  <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                    {timeline.description}
-                  </Typography>
-                </CardContent>
-              </CardActionArea>
-            </Card>
+            <TimelineCard timeline={timeline}/>
           ))}
         </div>
       </section>
@@ -89,24 +72,7 @@ function TimelinesPage() {
         </Typography>
         <div className="flex gap-4 mt-5">
           {collaborationTimelines.map((timeline) => (
-            <Card sx={{ maxWidth: 345 }} key={timeline._id}>
-              <CardActionArea>
-                <CardMedia
-                  component="img"
-                  height="140"
-                  image={timeline.icon}
-                  alt="Timeline image"
-                />
-                <CardContent>
-                  <Typography gutterBottom variant="h5" component="div">
-                    {timeline.title}
-                  </Typography>
-                  <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                    {timeline.description}
-                  </Typography>
-                </CardContent>
-              </CardActionArea>
-            </Card>
+            <TimelineCard timeline={timeline}/>
           ))}
         </div>
       </section>
