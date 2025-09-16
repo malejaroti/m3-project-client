@@ -76,8 +76,11 @@ export default function ItemForm(props: ItemFormProps) {
       ? dayjs(props.item.endDate)
       : dayjs()
   );
-  const [allDayEvent, setAllDayEvent] = useState(
+  const [oneDayEvent, setOneDayEvent] = useState(
     formData.startDate === formData.endDate
+  );
+  const [ongoingEvent, setOngoingEvent] = useState(
+    props.formType === 'edit' && props.item?.endDate === ''
   );
   const navigate = useNavigate();
 
@@ -103,35 +106,54 @@ export default function ItemForm(props: ItemFormProps) {
       // backend sends the image to the frontend => res.json({ imageUrl: req.file.path });
       console.log('response to POST upload: ', response);
       setIsUploading(false); // to stop the loading animation
-      setFormData({
-        ...formData,
-        images: [...formData.images, response.data.imageUrl], // add new file
-      });
+
+      // Return the image URL instead of updating state here
+      return response.data.imageUrl;
     } catch (error) {
+      setIsUploading(false);
       navigate('/error');
+      throw error; // Re-throw to handle in handleSubmit
     }
   };
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
+
+    let uploadedImageUrl = null;
+
+    // Wait for file upload to complete before creating the item
     if (file !== null) {
-      handleFileUpload(file);
+      try {
+        uploadedImageUrl = await handleFileUpload(file);
+      } catch (error) {
+        console.error('Image upload failed:', error);
+        return; // Stop submission if image upload fails
+      }
     }
+
+    // Build the images array including any newly uploaded image
+    const finalImages = uploadedImageUrl
+      ? [...formData.images, uploadedImageUrl]
+      : formData.images;
+
     const newItem = {
       ...formData,
       startDate: startDateValue ? startDateValue.format('YYYY-MM-DD') : '',
-      endDate: allDayEvent
+      endDate: oneDayEvent
         ? startDateValue
           ? startDateValue.format('YYYY-MM-DD')
           : ''
-        : endDateValue
-          ? endDateValue.format('YYYY-MM-DD')
-          : '',
+        : ongoingEvent
+          ? '' // Ongoing events have no end date
+          : endDateValue
+            ? endDateValue.format('YYYY-MM-DD')
+            : '',
+      images: finalImages, // Use the final images array
       impact: 'positive',
     };
     console.log('new item: ', newItem);
-    isUploading;
+
     try {
-      const response = api.post(
+      const response = await api.post(
         `/timelines/${formData.timeline}/items`,
         newItem
       );
@@ -140,6 +162,35 @@ export default function ItemForm(props: ItemFormProps) {
       navigate('/error');
     }
   };
+  
+  const handleItemUpdate = async() => {
+    
+    const updatedItem = {
+      ...formData,
+      startDate: startDateValue ? startDateValue.format('YYYY-MM-DD') : '',
+      endDate: oneDayEvent
+        ? startDateValue
+          ? startDateValue.format('YYYY-MM-DD')
+          : ''
+        : ongoingEvent
+          ? '' // Ongoing events have no end date
+          : endDateValue
+            ? endDateValue.format('YYYY-MM-DD')
+            : '',
+      // images: finalImages, // Use the final images array
+      // impact: 'positive',
+    };
+    console.log('Upadted item: ', updatedItem);
+    try {
+      const response = await api.put(
+        `/timelines/${formData.timeline}/items/${props.item?._id}`,
+        updatedItem
+      );
+      console.log('Res PUT updated item: ', response);
+    } catch (error) {
+      navigate('/error');
+    }
+  }
 
   return (
     <main className="m-5">
@@ -183,7 +234,7 @@ export default function ItemForm(props: ItemFormProps) {
         </FormGrid>
         <FormGrid>
           <FormLabel htmlFor="start-date" required>
-            {allDayEvent ? 'Date' : 'Start Date'}
+            {oneDayEvent ? 'Date' : ongoingEvent ? 'Start Date (ongoing)' : 'Start Date'}
           </FormLabel>
           <LocalizationProvider dateAdapter={AdapterDayjs}>
             <DatePicker
@@ -198,15 +249,30 @@ export default function ItemForm(props: ItemFormProps) {
           <FormControlLabel
             control={
               <Checkbox
-                checked={allDayEvent}
-                onChange={(_event, checked) => setAllDayEvent(checked)}
-                // sx={allDayEvent ? { display: "inline-block" } : { display: "none" }}
+                checked={oneDayEvent}
+                onChange={(_event, checked) => {
+                  setOneDayEvent(checked);
+                  if (checked) setOngoingEvent(false); // Can't be both one-day and ongoing
+                }}
+              // sx={allDayEvent ? { display: "inline-block" } : { display: "none" }}
               />
             }
             label="One day event"
           />
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={ongoingEvent}
+                onChange={(_event, checked) => {
+                  setOngoingEvent(checked);
+                  if (checked) setOneDayEvent(false); // Can't be both ongoing and one-day
+                }}
+              />
+            }
+            label="Ongoing event (no end date yet)"
+          />
         </FormGrid>
-        {!allDayEvent && (
+        {!oneDayEvent && !ongoingEvent && (
           <FormGrid>
             <FormLabel htmlFor="end-date" required>
               End Date
@@ -218,7 +284,7 @@ export default function ItemForm(props: ItemFormProps) {
                 value={endDateValue}
                 onChange={(newValue) => setEndDateValue(newValue)}
                 slotProps={{ textField: { fullWidth: true, id: 'end-date' } }}
-                // sx={allDayEvent ? { display: "inline-block" } : { display: "none" }}
+              // sx={allDayEvent ? { display: "inline-block" } : { display: "none" }}
               />
             </LocalizationProvider>
           </FormGrid>
@@ -252,7 +318,8 @@ export default function ItemForm(props: ItemFormProps) {
           variant="contained"
           type="submit"
           size="medium"
-          onClick={handleSubmit}
+          onClick={props.formType === "create"? handleSubmit : handleItemUpdate}
+          loading={isUploading}
         >
           {props.formType === 'create' ? 'Create item' : 'Save changes'}
         </Button>

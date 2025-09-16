@@ -147,9 +147,15 @@ function TimelineItemsPage() {
                     {timelineItem.title}
                   </Typography>
                   <Typography variant="body1" sx={{ color: 'text.secondary' }}>
-                    {new Intl.DateTimeFormat('en-GB').format(
+                    {`${new Intl.DateTimeFormat('en-GB').format(
                       new Date(timelineItem.startDate)
-                    )}
+                    )}`}
+                    {` - `}
+                    {timelineItem.endDate
+                      ? `${new Intl.DateTimeFormat('en-GB').format(
+                          new Date(timelineItem.endDate)
+                        )}`
+                      : 'Present'}
                   </Typography>
                   <Typography variant="body2" sx={{ color: 'text.secondary' }}>
                     {timelineItem.description}
