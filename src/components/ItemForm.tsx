@@ -73,10 +73,12 @@ export default function ItemForm(props: ItemFormProps) {
   const [endDateValue, setEndDateValue] = useState<Dayjs | null>(
     props.formType === 'edit' && props.item?.endDate
       ? dayjs(props.item.endDate)
-      : dayjs()
+      : null
   );
   const [oneDayEvent, setOneDayEvent] = useState(
-    formData.startDate === formData.endDate
+    props.formType === 'edit' && props.item
+      ? props.item.startDate === props.item.endDate
+      : false
   );
   const [ongoingEvent, setOngoingEvent] = useState(
     props.formType === 'edit' && props.item?.endDate === ''
@@ -183,7 +185,7 @@ export default function ItemForm(props: ItemFormProps) {
 
     // Build the images array including any newly uploaded image
     const finalImages = uploadedImageUrl
-      ? [ uploadedImageUrl]
+      ? [uploadedImageUrl]
       : formData.images;
 
     const updatedItem = {
@@ -315,7 +317,7 @@ export default function ItemForm(props: ItemFormProps) {
           </FormGrid>
         )}
         <FormGrid size={{ xs: 12 }}>
-          <ImageUploader onFileSelect={setFile} itemImage={props.item?.images[0]}/>
+          <ImageUploader onFileSelect={setFile} itemImage={props.item?.images[0]} />
         </FormGrid>
         {/* <FormGrid >
               <TextField
