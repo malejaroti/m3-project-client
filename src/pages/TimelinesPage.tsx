@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react';
 import api from '../services/config.services';
-import Card from '@mui/material/Card';
-import CardContent from '@mui/material/CardContent';
-import CardMedia from '@mui/material/CardMedia';
 import Typography from '@mui/material/Typography';
-import CardActionArea from '@mui/material/CardActionArea';
 import { Link } from 'react-router';
+import TimelineCard from '../components/TimelineCard';
+import Button from '@mui/material/Button';
+import Drawer from '@mui/material/Drawer';
+import AddButton from '../components/AddButton';
+import type { DrawerPosition, DrawerState } from './TimelineItemsPage';
 
 export interface ITimeline {
   _id: string;
@@ -24,9 +25,12 @@ export interface ITimeline {
 
 function TimelinesPage() {
   const [userTimelines, setUserTimelines] = useState<ITimeline[]>([]);
-  const [collaborationTimelines, setCollaborationTimelines] = useState<
-    ITimeline[]
-  >([]);
+  const [collaborationTimelines, setCollaborationTimelines] = useState<ITimeline[]>([]);
+  const [drawerState, setDrawerState] = useState<DrawerState>({
+    position: 'right',
+    open: false,
+  });
+
 
   useEffect(() => {
     getUserTimelines();
@@ -53,33 +57,15 @@ function TimelinesPage() {
   };
 
   return (
-    <>
+    <main className='relative'>
       <section className="user-timelines">
         <Typography variant="h4" component="h2">
           My timelines
         </Typography>
-        <div className="flex gap-4 mt-5">
+        <div className="timelines-container border">
           {userTimelines.map((timeline) => (
             // {console.log(timeline)}
-
-            <Card sx={{ maxWidth: 345 }} key={timeline._id}>
-              <CardActionArea component={Link} to={`/timeline/${timeline._id}`}>
-                <CardMedia
-                  component="img"
-                  height="140"
-                  image={timeline.icon}
-                  alt="Timeline image"
-                />
-                <CardContent>
-                  <Typography gutterBottom variant="h5" component="div">
-                    {timeline.title}
-                  </Typography>
-                  <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                    {timeline.description}
-                  </Typography>
-                </CardContent>
-              </CardActionArea>
-            </Card>
+            <TimelineCard timeline={timeline} />
           ))}
         </div>
       </section>
@@ -87,30 +73,48 @@ function TimelinesPage() {
         <Typography variant="h4" component="h2">
           Collaboration timelines
         </Typography>
-        <div className="flex gap-4 mt-5">
+        <div className="timelines-container">
           {collaborationTimelines.map((timeline) => (
-            <Card sx={{ maxWidth: 345 }} key={timeline._id}>
-              <CardActionArea>
-                <CardMedia
-                  component="img"
-                  height="140"
-                  image={timeline.icon}
-                  alt="Timeline image"
-                />
-                <CardContent>
-                  <Typography gutterBottom variant="h5" component="div">
-                    {timeline.title}
-                  </Typography>
-                  <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                    {timeline.description}
-                  </Typography>
-                </CardContent>
-              </CardActionArea>
-            </Card>
+            <TimelineCard timeline={timeline} />
           ))}
         </div>
       </section>
-    </>
+      <AddButton handleOnClick={() => setDrawerState((prev) => ({ ...prev, open: true}))} buttonLabel='Add new timeline'/>
+
+      <Drawer
+        anchor={drawerState.position}
+        open={drawerState.open}
+        // onClose={closeDrawer}
+        onClose={(_, __) => setDrawerState((prev) => ({ ...prev, open: false }))}
+        sx={{
+          '& .MuiDrawer-paper': {
+            width: { xs: '90%', sm: 500, md: 600 },
+          },
+        }}
+      >
+        <div>
+          <p>Hola como vas</p>
+        </div>
+        {/* {formType === 'create' && timelineId && (
+          <ItemForm
+            formType="create"
+            timelineId={timelineId.toString()}
+            onSuccess={closeDrawer}
+            onRefresh={getTimelineItems}
+          />
+        )}
+
+        {formType === 'edit' && selectedTimelineItem && timelineId && (
+          <ItemForm
+            formType="edit"
+            item={selectedTimelineItem}
+            timelineId={timelineId.toString()}
+            onSuccess={closeDrawer}
+            onRefresh={getTimelineItems}
+          />
+        )} */}
+      </Drawer>
+    </main>
   );
 }
 export default TimelinesPage;
