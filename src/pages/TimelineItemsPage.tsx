@@ -23,6 +23,7 @@ import Fade from '@mui/material/Fade';
 import TimelineWidget, { type VisTimelineItem } from "../components/vis-timeline/VisTimelineWidget"
 import FleetTimeline from "../components/vis-timeline/FleetTimeline";
 import SimplerTimelineWidget from '../components/vis-timeline/simplerTimelineGptEx';
+import AddButton from '../components/AddButton';
 
 
 
@@ -67,8 +68,8 @@ export type TimelineItemCreateDTO = Omit<
 // DTO for updating an existing item (partial fields allowed)
 export type TimelineItemUpdateDTO = Partial<TimelineItemCreateDTO>;
 
-type DrawerPosition = 'top' | 'left' | 'bottom' | 'right';
-interface DrawerState {
+export type DrawerPosition = 'top' | 'left' | 'bottom' | 'right';
+export interface DrawerState {
   position: DrawerPosition;
   open: boolean;
 }
@@ -298,23 +299,8 @@ function TimelineItemsPage() {
               {/* <FleetTimeline items={timelineItems} timelineTitle={timelineDetails?.title} /> */}
               <SimplerTimelineWidget items={newArr} title={timelineDetails?.title ?? 'test'}/>
         </section>
-        <Button
-          variant="contained"
-          size='large'
-          sx={{
-            fontSize: '1.3rem',
-            position: 'absolute',
-            top: 16, // equivalente a theme.spacing(2)
-            right: 40,
-            bgcolor: 'primary.main', // use theme's color
-            '&:hover': {
-              bgcolor: 'primary.dark',
-            },
-          }}
-          onClick={() => openDrawerCreate('right')}
-        >
-          Add a new item
-        </Button>
+        <AddButton handleOnClick={() => setDrawerState((prev) => ({ ...prev, open: true}))} buttonLabel='Add new item'/>
+        
 
         <div>
           <Drawer

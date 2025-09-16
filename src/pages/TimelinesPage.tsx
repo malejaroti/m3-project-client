@@ -7,6 +7,10 @@ import Typography from '@mui/material/Typography';
 import CardActionArea from '@mui/material/CardActionArea';
 import { Link } from 'react-router';
 import TimelineCard from '../components/TimelineCard';
+import Button from '@mui/material/Button';
+import Drawer from '@mui/material/Drawer';
+import AddButton from '../components/AddButton';
+import type { DrawerPosition, DrawerState } from './TimelineItemsPage';
 
 export interface ITimeline {
   _id: string;
@@ -25,9 +29,12 @@ export interface ITimeline {
 
 function TimelinesPage() {
   const [userTimelines, setUserTimelines] = useState<ITimeline[]>([]);
-  const [collaborationTimelines, setCollaborationTimelines] = useState<
-    ITimeline[]
-  >([]);
+  const [collaborationTimelines, setCollaborationTimelines] = useState<ITimeline[]>([]);
+  const [drawerState, setDrawerState] = useState<DrawerState>({
+    position: 'right',
+    open: false,
+  });
+
 
   useEffect(() => {
     getUserTimelines();
@@ -54,15 +61,15 @@ function TimelinesPage() {
   };
 
   return (
-    <>
+    <main className='relative'>
       <section className="user-timelines">
         <Typography variant="h4" component="h2">
           My timelines
         </Typography>
-        <div className="flex gap-4 mt-5 border">
+        <div className="timelines-container border">
           {userTimelines.map((timeline) => (
             // {console.log(timeline)}
-            <TimelineCard timeline={timeline}/>
+            <TimelineCard timeline={timeline} />
           ))}
         </div>
       </section>
@@ -70,13 +77,48 @@ function TimelinesPage() {
         <Typography variant="h4" component="h2">
           Collaboration timelines
         </Typography>
-        <div className="flex gap-4 mt-5">
+        <div className="timelines-container">
           {collaborationTimelines.map((timeline) => (
-            <TimelineCard timeline={timeline}/>
+            <TimelineCard timeline={timeline} />
           ))}
         </div>
       </section>
-    </>
+      <AddButton handleOnClick={() => setDrawerState((prev) => ({ ...prev, open: true}))} buttonLabel='Add new timeline'/>
+
+      <Drawer
+        anchor={drawerState.position}
+        open={drawerState.open}
+        // onClose={closeDrawer}
+        onClose={(_, __) => setDrawerState((prev) => ({ ...prev, open: false }))}
+        sx={{
+          '& .MuiDrawer-paper': {
+            width: { xs: '90%', sm: 500, md: 600 },
+          },
+        }}
+      >
+        <div>
+          <p>Hola como vas</p>
+        </div>
+        {/* {formType === 'create' && timelineId && (
+          <ItemForm
+            formType="create"
+            timelineId={timelineId.toString()}
+            onSuccess={closeDrawer}
+            onRefresh={getTimelineItems}
+          />
+        )}
+
+        {formType === 'edit' && selectedTimelineItem && timelineId && (
+          <ItemForm
+            formType="edit"
+            item={selectedTimelineItem}
+            timelineId={timelineId.toString()}
+            onSuccess={closeDrawer}
+            onRefresh={getTimelineItems}
+          />
+        )} */}
+      </Drawer>
+    </main>
   );
 }
 export default TimelinesPage;
