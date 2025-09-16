@@ -35,14 +35,27 @@ function LifeTimeline() {
 
         // Create visTimelineItems - flatten all items from all timelines
         const visTimelineItems: VisTimelineItem[] = timelinesWithItems.flatMap((timeline, timelineIndex) =>
-            timeline.items.map(item => ({
-                ...item,
-                id: item._id, // Map MongoDB _id to vis-timeline id
-                content: item.title,
-                start: new Date(item.startDate),
-                end: item.endDate ? new Date(item.endDate) : undefined,
-                group: timelineIndex + 1, // Each timeline gets its own group
-            }))
+            timeline.items.map(item => {
+                const startDate = new Date(item.startDate);
+                let endDate: Date | undefined;
+
+                // Handle one-day events: if no endDate or same as startDate, make it a full day block
+                if (!item.endDate || item.startDate === item.endDate) {
+                    endDate = new Date(startDate);
+                    endDate.setDate(endDate.getDate() + 1); // Add one day to make it a block
+                } else {
+                    endDate = new Date(item.endDate);
+                }
+
+                return {
+                    ...item,
+                    id: item._id, // Map MongoDB _id to vis-timeline id
+                    content: item.title,
+                    start: startDate,
+                    end: endDate,
+                    group: timelineIndex + 1, // Each timeline gets its own group
+                };
+            })
         );
 
         // Create groups for each timeline
