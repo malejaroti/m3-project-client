@@ -158,7 +158,6 @@ function TimelineItemsPage() {
                 {/* <CardActionArea> */}
                 <CardMedia
                   component="img"
-                  height="100"
                   image={
                     timelineItem.images && timelineItem.images.length > 0
                       ? timelineItem.images[0]
@@ -166,8 +165,10 @@ function TimelineItemsPage() {
                   }
                   alt="Timeline image"
                   sx={{
-                    // aspectRatio: "16/9",
-                    // objectFit: "object-fit"
+                    minHeight: 400,
+                    objectFit: 'cover', //contain
+                    backgroundColor: '#f5f5f5',
+                    padding:'2px 10px'
                   }}
                 />
                 <CardContent sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }} className="">

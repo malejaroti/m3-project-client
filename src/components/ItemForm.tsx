@@ -170,6 +170,23 @@ export default function ItemForm(props: ItemFormProps) {
   const handleItemUpdate = async (event: React.FormEvent) => {
     event.preventDefault();
 
+    let uploadedImageUrl = formData.images[0];
+
+    // Wait for file upload to complete before creating the item
+    if (file !== null) {
+      try {
+        uploadedImageUrl = await handleFileUpload(file);
+      } catch (error) {
+        console.error('Image upload failed:', error);
+        return; // Stop submission if image upload fails
+      }
+    }
+
+    // Build the images array including any newly uploaded image
+    const finalImages = uploadedImageUrl
+      ? [ uploadedImageUrl]
+      : formData.images;
+
     const updatedItem = {
       ...formData,
       startDate: startDateValue ? startDateValue.format('YYYY-MM-DD') : '',
@@ -182,7 +199,7 @@ export default function ItemForm(props: ItemFormProps) {
           : endDateValue
             ? endDateValue.format('YYYY-MM-DD')
             : '',
-      // images: finalImages, // Use the final images array
+      images: finalImages, // Use the final images array
       // impact: 'positive',
     };
     console.log('Upadted item: ', updatedItem);
@@ -299,7 +316,7 @@ export default function ItemForm(props: ItemFormProps) {
           </FormGrid>
         )}
         <FormGrid size={{ xs: 12 }}>
-          <ImageUploader onFileSelect={setFile} />
+          <ImageUploader onFileSelect={setFile} itemImage={props.item?.images[0]}/>
         </FormGrid>
         {/* <FormGrid >
               <TextField
@@ -318,11 +335,22 @@ export default function ItemForm(props: ItemFormProps) {
         component="form"
         sx={{
           display: 'flex',
-          flexDirection: 'column',
+          flexDirection: 'row',
           alignItems: 'center',
+          justifyContent: 'space-evenly',
           marginTop: { xs: 2, sm: 5, md: 10 },
         }}
+        className=''
       >
+        <Button
+          variant="contained"
+          type="button"
+          size="medium"
+          disabled
+        // onClick={props.formType === "create" ? handleSubmit : handleItemUpdate}
+        >
+          Cancel
+        </Button>
         <Button
           variant="contained"
           type="submit"

@@ -15,7 +15,8 @@ type ImageUploaderProps = {
   onFileSelect?: (file: File | null) => void;
   maxSizeMB?: number; // default 5MB
   accepted?: string; // default "image/*"
-  label?: string;
+  itemImage?: string
+  label?: string; // button text
   //   formDataSetter: React.SetStateAction
 };
 
@@ -23,7 +24,8 @@ export default function ImageUploader({
   onFileSelect,
   maxSizeMB = 5,
   accepted = 'image/*',
-  label = 'Upload image',
+  itemImage,
+  label = itemImage? "Change Image" :'Upload image',
 }: ImageUploaderProps) {
   const inputId = useId();
   const inputRef = useRef<HTMLInputElement | null>(null);
@@ -135,6 +137,26 @@ export default function ImageUploader({
               Delete
             </Button>
           </CardActions> */}
+        </Card>
+      )}
+
+      {itemImage && (
+        <Card variant="outlined" sx={{ maxWidth: 420 }}>
+          <CardMedia
+            component="img"
+            image={itemImage}
+            alt={itemImage}
+            sx={{ aspectRatio: '16 / 9', objectFit: 'cover' }}
+          />
+          {/* <CardContent>
+            <Typography variant="subtitle1" fontWeight={600}>
+              {file.name}
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              {(file.size / (1024 * 1024)).toFixed(2)} MB • {file.type}
+            </Typography>
+          </CardContent> */}
+
         </Card>
       )}
     </Stack>
