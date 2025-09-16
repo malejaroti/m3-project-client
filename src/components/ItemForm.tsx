@@ -21,7 +21,6 @@ import type {
 } from '../pages/TimelineItemsPage';
 import { AuthContext } from '../context/auth.context';
 import ImageUploader from './ImageUploader';
-import CloudinaryImageUploader from './CloudinaryImageUploader';
 import api from '../services/config.services';
 import { useNavigate } from 'react-router';
 import dayjs, { Dayjs } from 'dayjs';
