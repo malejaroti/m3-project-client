@@ -1,6 +1,6 @@
 import { useEffect, useState, Fragment, useCallback } from 'react';
 import api from '../services/config.services';
-import { Link, useParams } from 'react-router';
+import { Link, useNavigate, useParams } from 'react-router';
 
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
@@ -9,10 +9,13 @@ import Typography from '@mui/material/Typography';
 import CardActionArea from '@mui/material/CardActionArea';
 import type { ITimeline } from './TimelinesPage';
 import Edit from '@mui/icons-material/Edit';
+import Delete from '@mui/icons-material/Delete';
 import IconButton from '@mui/material/IconButton';
 import Button from '@mui/material/Button';
 import Drawer from '@mui/material/Drawer';
 import ItemForm, { type FormType } from '../components/ItemForm';
+import Grid from '@mui/material/Grid';
+import Box from '@mui/material/Box';
 
 // Server timeline item model (normalized). Dates are ISO strings; arrays are plain string arrays.
 export interface ITimelineItem {
@@ -51,14 +54,14 @@ interface DrawerState {
 function TimelineItemsPage() {
   const [timelineDetails, setTimelineDetails] = useState<ITimeline>();
   const [timelineItems, setTimelineItems] = useState<ITimelineItem[]>([]);
-  const [selectedTimelineItem, setSelectedTimelineItem] =
-    useState<ITimelineItem | null>(null);
+  const [selectedTimelineItem, setSelectedTimelineItem] = useState<ITimelineItem | null>(null);
   const { timelineId } = useParams<{ timelineId: string }>();
   const [formType, setFormType] = useState<FormType>(null);
   const [drawerState, setDrawerState] = useState<DrawerState>({
     position: 'right',
     open: false,
   });
+  const navigate = useNavigate()
 
   useEffect(() => {
     getTimelineDetails();
@@ -121,52 +124,112 @@ function TimelineItemsPage() {
     setDrawerState((prev) => ({ ...prev, open: false }));
   }, []);
 
+
+  const handleItemDelete = async (item: ITimelineItem) => {
+    console.log("Timeline Details: ", { timelineDetails })
+    console.log("Timeline Id (params): ", { timelineId })
+    try {
+      // const response = await api.delete(`/timelines/${timelineDetails?._id}/items/${item}`);
+      const response = await api.delete(`/timelines/${timelineId}/items/${item._id}`);
+      console.log('Res DELETE item: ', response);
+      getTimelineItems()
+    } catch (error) {
+      navigate('/error');
+    }
+  }
+
   return (
     <>
       <main className="relative">
-        <section className="gallery-timeline-items m-5 border">
-          <Typography variant="h4" component="h2">
+        <section className="gallery-timeline-items m-5">
+          <Typography variant="h3" component="h2">
             {timelineDetails?.title}
           </Typography>
-          <div className="flex gap-4 mt-5">
+          <Typography variant="h5" color='' component="h2">
+            {timelineDetails?.description}
+          </Typography>
+          {/* <Grid container spacing={3} sx={{ border: '1px black solid' }}>
+
+          </Grid> */}
+
+          <div className="flex flex-wrap justify-center gap-20 mt-10 lg:flex-row sm:flex-col">
             {timelineItems.map((timelineItem) => (
-              <Card sx={{ maxWidth: 345 }} key={timelineItem._id}>
+              <Card sx={{ maxWidth: 300, display: 'flex', flexDirection: 'column' }} key={timelineItem._id} className='p-5'>
                 {/* <CardActionArea> */}
                 <CardMedia
                   component="img"
-                  height="140"
+                  height="100"
                   image={
                     timelineItem.images && timelineItem.images.length > 0
                       ? timelineItem.images[0]
                       : undefined
                   }
                   alt="Timeline image"
+                  sx={{
+                    // aspectRatio: "16/9",
+                    // objectFit: "object-fit"
+                  }}
                 />
-                <CardContent>
+                <CardContent sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }} className="">
                   <Typography gutterBottom variant="h5" component="div">
                     {timelineItem.title}
                   </Typography>
-                  <Typography variant="body1" sx={{ color: 'text.secondary' }}>
+                  <Typography variant="body1"
+                    sx={{
+                      color: 'text.secondary',
+                      paddingBottom: '5px'
+                    }}>
                     {`${new Intl.DateTimeFormat('en-GB').format(
                       new Date(timelineItem.startDate)
                     )}`}
-                    {` - `}
-                    {timelineItem.endDate
-                      ? `${new Intl.DateTimeFormat('en-GB').format(
+                    {timelineItem.startDate === timelineItem.endDate ? "" :
+                      timelineItem.endDate
+                        ? ` - ${new Intl.DateTimeFormat('en-GB').format(
                           new Date(timelineItem.endDate)
                         )}`
-                      : 'Present'}
+                        : ' - Present'}
                   </Typography>
-                  <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                  <Typography variant="body2" sx={{
+                    color: 'text.secondary',
+                    // display: '-webkit-box',
+                    // WebkitLineClamp: 2,
+                    // WebkitBoxOrient: 'vertical',
+                    // // overflowY: 'scroll',
+                    // overflow: 'hidden',
+                    // textOverflow: 'ellipsis'
+                  }}>
                     {timelineItem.description}
                   </Typography>
-                  <IconButton
-                    aria-label="Edit item"
-                    onClick={() => openDrawerEdit(timelineItem, 'right')}
-                    size="small"
-                  >
-                    <Edit fontSize="small" />
-                  </IconButton>
+                  <Box sx={{
+                    display: 'flex',
+                    marginTop: 'auto',
+                    alignSelf: 'flex-end',
+                  }}
+                    className="">
+                    <IconButton
+                      aria-label="Edit item"
+                      onClick={() => openDrawerEdit(timelineItem, 'right')}
+                      size="small"
+                      sx={{
+                        alignSelf: 'flex-end',
+                        justifySelf: 'flex-end',
+                      }}
+                    >
+                      <Edit fontSize="small" />
+                    </IconButton>
+                    <IconButton
+                      aria-label="Delete item"
+                      onClick={() => handleItemDelete(timelineItem)}
+                      size="small"
+                      sx={{
+                        alignSelf: 'flex-end',
+                        justifySelf: 'flex-end',
+                      }}
+                    >
+                      <Delete fontSize="small" />
+                    </IconButton>
+
+                  </Box>
                 </CardContent>
                 {/* </CardActionArea> */}
               </Card>
@@ -175,19 +238,21 @@ function TimelineItemsPage() {
         </section>
         <Button
           variant="contained"
+          size='large'
           sx={{
+            fontSize: '1.3rem',
             position: 'absolute',
             top: 16, // equivalente a theme.spacing(2)
-            right: 16,
+            right: 40,
             bgcolor: 'primary.main', // use theme's color
             '&:hover': {
               bgcolor: 'primary.dark',
             },
           }}
           onClick={() => openDrawerCreate('right')}
-          // onClick={toggleDrawer('right', true, "create")}
+        // onClick={toggleDrawer('right', true, "create")}
         >
-          Add a new moment
+          Add a new item
         </Button>
 
         <div>
@@ -202,7 +267,12 @@ function TimelineItemsPage() {
             }}
           >
             {formType === 'create' && timelineId && (
-              <ItemForm formType="create" timelineId={timelineId.toString()} />
+              <ItemForm
+                formType="create"
+                timelineId={timelineId.toString()}
+                onSuccess={closeDrawer}
+                onRefresh={getTimelineItems}
+              />
             )}
 
             {formType === 'edit' && selectedTimelineItem && timelineId && (
@@ -210,6 +280,8 @@ function TimelineItemsPage() {
                 formType="edit"
                 item={selectedTimelineItem}
                 timelineId={timelineId.toString()}
+                onSuccess={closeDrawer}
+                onRefresh={getTimelineItems}
               />
             )}
           </Drawer>

@@ -35,8 +35,8 @@ export type FormType = 'edit' | 'create' | null; //union
 
 // discriminated union
 type ItemFormProps =
-  | { formType: 'create'; timelineId: string; item?: never }
-  | { formType: 'edit'; item: ITimelineItem; timelineId: string };
+  | { formType: 'create'; timelineId: string; item?: never; onSuccess: () => void; onRefresh: () => void }
+  | { formType: 'edit'; item: ITimelineItem; timelineId: string; onSuccess: () => void; onRefresh: () => void };
 
 export default function ItemForm(props: ItemFormProps) {
   const authContext = useContext(AuthContext);
@@ -158,13 +158,18 @@ export default function ItemForm(props: ItemFormProps) {
         newItem
       );
       console.log('Res POST new item: ', response);
+
+      // Call the success callbacks
+      props.onRefresh(); // Refresh the timeline items
+      props.onSuccess(); // Close the drawer
     } catch (error) {
       navigate('/error');
     }
   };
-  
-  const handleItemUpdate = async() => {
-    
+
+  const handleItemUpdate = async (event: React.FormEvent) => {
+    event.preventDefault();
+
     const updatedItem = {
       ...formData,
       startDate: startDateValue ? startDateValue.format('YYYY-MM-DD') : '',
@@ -187,6 +192,10 @@ export default function ItemForm(props: ItemFormProps) {
         updatedItem
       );
       console.log('Res PUT updated item: ', response);
+
+      // Call the success callbacks
+      props.onRefresh(); // Refresh the timeline items
+      props.onSuccess(); // Close the drawer
     } catch (error) {
       navigate('/error');
     }
@@ -318,7 +327,7 @@ export default function ItemForm(props: ItemFormProps) {
           variant="contained"
           type="submit"
           size="medium"
-          onClick={props.formType === "create"? handleSubmit : handleItemUpdate}
+          onClick={props.formType === "create" ? handleSubmit : handleItemUpdate}
           loading={isUploading}
         >
           {props.formType === 'create' ? 'Create item' : 'Save changes'}
