@@ -75,11 +75,12 @@ function Navbar() {
   };
 
   return (
-    <nav className="w-full border-2 justify-center items-center border-mint-500 bg-slate-200">
+    <nav className="w-full justify-center items-center bg-slate-200 mb-5">
       <div className="flex justify-between items-center py-2 px-4">
         {/* Left side - Navigation links */}
         <ul className="flex gap-6 items-center w-full justify-around">
           {/* public links */}
+          { !isLoggedIn &&
           <li>
             <NavLink to="/">
               <Typography variant="h6" sx={navLinkStyles}>
@@ -87,6 +88,7 @@ function Navbar() {
               </Typography>
             </NavLink>
           </li>
+          }
 
           {/* anon links */}
           {!isLoggedIn && (
@@ -109,6 +111,16 @@ function Navbar() {
           )}
 
           {/* private links */}
+          {isLoggedIn && (
+            <li>
+              <NavLink to={'/lifetimeline'}>
+                <Typography variant="h6" sx={navLinkStyles}>
+                  Life timeline
+                </Typography>
+              </NavLink>
+            </li>
+          )}
+
           {isLoggedIn && (
             <li>
               <NavLink to={'/timelines'}>

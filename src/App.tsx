@@ -11,6 +11,7 @@ import TimelinesPage from './pages/TimelinesPage.tsx';
 import TimelineItemsPage from './pages/TimelineItemsPage.tsx';
 import ErrorPage from './pages/ErrorPage.tsx';
 import Home from './pages/Home.tsx';
+import LifeTimeline from './pages/LifeTimeline.tsx';
 
 // import Link from '@mui/material/Link'
 
@@ -24,7 +25,7 @@ function App() {
           <Navbar />
 
           {/* Main container */}
-          <main className="w-full flex-1 bb-red">
+          <main className="w-full flex-1 bb-red px-10">
             {/* <div className='central-section bb-black h-full w-[50%] m-auto'> */}
             <Routes>
               <Route path="/timelines" 
@@ -33,15 +34,9 @@ function App() {
                                 </OnlyPrivate>
                 }
               />
-              <Route
-                path="/timeline/:timelineId"
-                element={
-                  <OnlyPrivate>
-                    {' '}
-                    <TimelineItemsPage />{' '}
-                  </OnlyPrivate>
-                }
-              />
+              <Route path="/timeline/:timelineId" element={<OnlyPrivate>{' '}<TimelineItemsPage />{' '} </OnlyPrivate>} />
+              <Route path="/timeline/:timelineId" element={<OnlyPrivate>{' '}<TimelineItemsPage />{' '} </OnlyPrivate>} />
+              <Route path="/lifetimeline" element={<OnlyPrivate> <LifeTimeline /> </OnlyPrivate>} />
               <Route path="/" element={<Home />} />
               <Route path="/sign-up" element={<SignUp />} />
               <Route path="/sign-in" element={<SignIn />} />
