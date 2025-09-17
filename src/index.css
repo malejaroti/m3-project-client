@@ -113,6 +113,10 @@ button:focus-visible {
   word-wrap: break-word;
 } */
 
+.vis-item .vis-item-overflow {
+    background-color: var(--item-color, #ccc) !important;
+}
+
 .vis-item .vis-item-content img {
   width: 80px !important;
   height: 100px !important;
