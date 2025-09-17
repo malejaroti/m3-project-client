@@ -59,7 +59,7 @@ function TimelineCard(props: TimelineCardProps) {
             <div className="flex items-center gap-[8px] mb-[10px]">
               { props.timeline.icon !== "" 
                   ? <img src={props.timeline.icon} alt="timeline icon" className="size-[50px]" />
-                  : ""
+                  : null
               }
             <Typography variant="h4" className="self-center">
               {props.timeline.title}
