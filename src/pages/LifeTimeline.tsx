@@ -221,7 +221,7 @@ function LifeTimeline() {
         <>
             <Typography variant="h3">My Life Timeline</Typography>
             <div
-                className="master-timeline border mt-5 h-[calc(100vh-250px)] overflow-y-scroll"
+                className="master-timeline mt-5 h-[calc(100vh-250px)] bg-gradient-to-b from-blue-500 to-yellow-500 overflow-y-scroll"
                 ref={masterTimelineContainerRef}
                 style={{ width: "100%", minHeight: "600px" }}
             />

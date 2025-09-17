@@ -132,6 +132,18 @@ button:focus-visible {
   margin-top: 4px;
   display: block;
 }
+.vis-label.vis-group-level-0{
+  min-height: 70px;
+  /* height: 150px; */
+  /* max-height: 200px; */
+  border-bottom: 0.1px gray solid !important;
+}
+.vis-foreground .vis-group{
+  min-height: 70px;
+  /* height: 150px; */  
+  /* max-height: 200px; */
+  border-bottom: 0.5px gray solid !important;
+}
 /* .vis-label.vis-group-level-0{
   min-height: 150px;
   height: 150px;
