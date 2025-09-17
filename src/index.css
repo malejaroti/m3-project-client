@@ -114,7 +114,14 @@ button:focus-visible {
 } */
 
 .vis-item .vis-item-overflow {
-    background-color: var(--item-color, #ccc) !important;
+  background-color: var(--item-color, #ccc) !important;
+}
+
+/* Base styling for vis-timeline groups */
+.vis-label {
+  font-weight: bold !important;
+  text-align: center !important;
+  border: 1px solid #ddd !important;
 }
 
 .vis-item .vis-item-content img {
@@ -136,7 +143,7 @@ button:focus-visible {
   border-radius: 10px;
 } */
 
- /* .vis-item.vis-selected {
+/* .vis-item.vis-selected {
   border-color: green;
   background-color: lightgreen;
 } */
@@ -145,6 +152,15 @@ button:focus-visible {
   color: purple;
   padding-top: 10px;
   padding-left: 10px;
+} */
+
+/* .vis-axis > .vis-group:nth-child(1){
+  background-color: green !important;
+  border-color: blue;
+}
+.vis-axis > .vis-group:nth-child(2){
+  background-color: green !important;
+  border-color: blue;
 } */
 
 /* .vis-time-axis .vis-text.vis-major {

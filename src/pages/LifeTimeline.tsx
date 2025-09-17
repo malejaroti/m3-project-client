@@ -70,43 +70,58 @@ function LifeTimeline() {
         // Create groups for each timeline
         const groups: DataGroup[] = timelinesWithItems.map((timeline, index) => ({
             id: index + 1,
-            content: timeline.timelineTitle
+            content: timeline.timelineTitle,
         }));
 
         // Set CSS custom properties for each timeline's color AND create dynamic CSS rules
-        // timelinesWithItems.forEach((timeline, index) => {
-        //     const groupId = index + 1;
-        //     if (masterTimelineContainerRef.current) {
-        //         // Set CSS variable
-        //         masterTimelineContainerRef.current.style.setProperty(
-        //             `--timeline-${groupId}-color`,
-        //             timeline.timelineColor
-        //         );
+        timelinesWithItems.forEach((timeline, index) => {
+            const groupId = index + 1;
+            if (masterTimelineContainerRef.current) {
+                // Set CSS variable
+                masterTimelineContainerRef.current.style.setProperty(
+                    `--timeline-${groupId}-color`,
+                    " rgba(255, 192, 203, 0.5)"
+                );
 
-        //         // Create dynamic CSS rule for this group
-        //         const cssRule = `.vis-item.timeline-group-${groupId} .vis-item-overflow { 
-        //             background-color: var(--timeline-${groupId}-color, #ccc) !important; 
-        //         }`;
+                // Check if style element exists, if not create it
+                let styleElement = document.getElementById('dynamic-timeline-styles') as HTMLStyleElement;
+                if (!styleElement) {
+                    styleElement = document.createElement('style');
+                    styleElement.id = 'dynamic-timeline-styles';
+                    document.head.appendChild(styleElement);
+                }
 
-        //         // Check if style element exists, if not create it
-        //         let styleElement = document.getElementById('dynamic-timeline-styles') as HTMLStyleElement;
-        //         if (!styleElement) {
-        //             styleElement = document.createElement('style');
-        //             styleElement.id = 'dynamic-timeline-styles';
-        //             document.head.appendChild(styleElement);
-        //         }
+                // Create dynamic CSS rules for both items and groups
+                const cssRules = [
 
-        //         // Add the CSS rule
-        //         if (styleElement.sheet) {
-        //             try {
-        //                 styleElement.sheet.insertRule(cssRule, styleElement.sheet.cssRules.length);
-        //             } catch (e) {
-        //                 // Rule might already exist, that's okay
-        //                 console.log('CSS rule already exists or invalid:', e);
-        //             }
-        //         }
-        //     }
-        // });
+                    // Rule for group labels background
+                    `.vis-label.vis-group-level-0:nth-child(1) { 
+                        background-color: var(--timeline-${groupId}-color,  rgba(255, 192, 203, 0.5)) !important;
+                        border-radius: 4px !important;
+                        padding: 4px 8px !important;
+                    }`,
+                    // Alternative selector in case the data-group attribute doesn't work
+                    `.vis-group:nth-child(1) { 
+                        background-color: var(--timeline-${groupId}-color,  rgba(255, 192, 203, 0.5)) !important;
+                        color: white !important;
+                        border-radius: 4px !important;
+                        padding: 4px 8px !important;
+                    }`
+                ];
+
+                // Add all CSS rules
+                if (styleElement.sheet) {
+                    cssRules.forEach(cssRule => {
+                        try {
+                            styleElement.sheet!.insertRule(cssRule, styleElement.sheet!.cssRules.length);
+                        } catch (e) {
+                            // Rule might already exist, that's okay
+                            console.log('CSS rule already exists or invalid:', e);
+                        }
+                    });
+                }
+            }
+        });
 
         // Initialize DataSets
         itemsDSRef.current = new DataSet<VisTimelineItem>(visTimelineItems);
