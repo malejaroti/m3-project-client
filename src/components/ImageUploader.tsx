@@ -3,7 +3,6 @@ import { useEffect, useId, useMemo, useRef, useState } from 'react';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
-import CardActions from '@mui/material/CardActions';
 import CardContent from '@mui/material/CardContent';
 import CardMedia from '@mui/material/CardMedia';
 import Stack from '@mui/material/Stack';
@@ -25,13 +24,13 @@ export default function ImageUploader({
   maxSizeMB = 5,
   accepted = 'image/*',
   itemImage,
-  label = itemImage? "Change Image" :'Upload image',
+  label = itemImage ? "Change Image" : 'Upload image',
 }: ImageUploaderProps) {
   const inputId = useId();
   const inputRef = useRef<HTMLInputElement | null>(null);
   const [file, setFile] = useState<File | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [isUploading, setIsUploading] = useState(false); // for a loading animation effect
+  const [isFileSelected, setIsFileSelected] = useState(false);
 
   const previewUrl = useMemo(
     () => (file ? URL.createObjectURL(file) : ''),
@@ -64,11 +63,13 @@ export default function ImageUploader({
 
     setError(null);
     setFile(f);
+    setIsFileSelected(true)
     onFileSelect?.(f);
   };
 
   const resetFileInput = () => {
     setFile(null);
+    setIsFileSelected(false)
     onFileSelect?.(null);
     if (inputRef.current) inputRef.current.value = ''; // allow re-selecting the same file
   };
@@ -119,7 +120,7 @@ export default function ImageUploader({
             component="img"
             image={previewUrl}
             alt={file.name}
-            sx={{ aspectRatio: '16 / 9', objectFit: 'cover' }}
+            sx={{ aspectRatio: '16 / 9', objectFit: 'contain' }}
           />
           <CardContent>
             <Typography variant="subtitle1" fontWeight={600}>
@@ -141,12 +142,16 @@ export default function ImageUploader({
       )}
 
       {itemImage && (
-        <Card variant="outlined" sx={{ maxWidth: 420 }}>
+        <Card variant="outlined" sx={{ maxHeight: 350, p: 2, display: "flex", flexDirection: "column", justifyContent: "center" }}>
+          {
+            isFileSelected && <Typography variant='h6' align='center' sx={{ mb: 2 }}>Previous Image</Typography>
+          }
+
           <CardMedia
             component="img"
             image={itemImage}
             alt={itemImage}
-            sx={{ aspectRatio: '16 / 9', objectFit: 'cover' }}
+            sx={{ flex: 1, minHeight: 0, aspectRatio: '1 / 1', objectFit: 'contain' }}
           />
           {/* <CardContent>
             <Typography variant="subtitle1" fontWeight={600}>

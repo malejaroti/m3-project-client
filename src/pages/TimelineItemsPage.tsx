@@ -13,7 +13,7 @@ import Delete from '@mui/icons-material/Delete';
 import IconButton from '@mui/material/IconButton';
 import Button from '@mui/material/Button';
 import Drawer from '@mui/material/Drawer';
-import ItemForm, { type FormType } from '../components/ItemForm';
+import ItemForm, { type FormType } from '../components/Forms/ItemForm';
 import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
 import Backdrop from '@mui/material/Backdrop';
@@ -113,22 +113,6 @@ function TimelineItemsPage() {
       console.log(error);
     }
   };
-  /* const toggleDrawer =
-    (position: DrawerPosition, open: boolean, formType: FormType) =>
-      (event: React.MouseEvent) => {
-        event.stopPropagation();
-        // if (
-        //   event.type === 'keydown' &&
-        //   ((event as React.KeyboardEvent).key === 'Tab' ||
-        //     (event as React.KeyboardEvent).key === 'Shift')
-        // ) {
-        //   return;
-        // }
-
-        setDrawerState({ ...drawerState, position: position, open: open, formType: formType });
-      };
-  */
-
   // useCallback keeps handler refs stable so children (e.g. <Button/Drawer>) don’t re-render unnecessarily
   // Without useCallback, a new function would be created on every render, which could cause avoidable updates.
   const openDrawerCreate = useCallback((position: DrawerPosition) => {
@@ -157,7 +141,6 @@ function TimelineItemsPage() {
   }
 
   const handleItemDelete = async () => {
-
     try {
       const response = await api.delete(`/timelines/${timelineId}/items/${selectedTimelineItem?._id}`);
       console.log('Res DELETE item: ', response);
@@ -167,6 +150,7 @@ function TimelineItemsPage() {
       navigate('/error');
     }
   }
+
   let newArr = timelineItems.map((item, index) => (
     {
       id: index,
@@ -196,21 +180,24 @@ function TimelineItemsPage() {
             {timelineItems.map((timelineItem) => (
               <Card sx={{ maxWidth: 300, display: 'flex', flexDirection: 'column' }} key={timelineItem._id} className='p-5'>
                 {/* <CardActionArea> */}
-                <CardMedia
-                  component="img"
-                  image={
-                    timelineItem.images && timelineItem.images.length > 0
-                      ? timelineItem.images[0]
-                      : undefined
-                  }
-                  alt="Timeline image"
-                  sx={{
-                    minHeight: 400,
-                    objectFit: 'cover', //contain
-                    backgroundColor: '#f5f5f5',
-                    padding: '2px 10px'
-                  }}
-                />
+                {timelineItem.images.length !== 0 ?
+                  <CardMedia
+                    component="img"
+                    image={
+                      timelineItem.images && timelineItem.images.length > 0
+                        ? timelineItem.images[0]
+                        : undefined
+                    }
+                    alt="Timeline image"
+                    sx={{
+                      minHeight: 400,
+                      objectFit: 'cover', //contain
+                      backgroundColor: '#f5f5f5',
+                      padding: '2px 10px'
+                    }}
+                  />
+                  : ""
+                }
                 <CardContent sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }} className="">
                   <Typography gutterBottom variant="h5" component="div">
                     {timelineItem.title}
@@ -298,7 +285,7 @@ function TimelineItemsPage() {
           {/* <FleetTimeline items={timelineItems} timelineTitle={timelineDetails?.title} /> */}
           {/* <SimplerTimelineWidget items={newArr} title={timelineDetails?.title ?? 'test'}/> */}
         </section>
-        <AddButton handleOnClick={() => openDrawerCreate('right')} buttonLabel='Add new item' />
+        <AddButton onClick={() => openDrawerCreate('right')} buttonLabel='Add new item' />
 
 
         <div>
@@ -318,6 +305,7 @@ function TimelineItemsPage() {
                 timelineId={timelineId.toString()}
                 onSuccess={closeDrawer}
                 onRefresh={getTimelineItems}
+                onCancel={closeDrawer}
               />
             )}
 
@@ -328,6 +316,7 @@ function TimelineItemsPage() {
                 timelineId={timelineId.toString()}
                 onSuccess={closeDrawer}
                 onRefresh={getTimelineItems}
+                onCancel={closeDrawer}
               />
             )}
           </Drawer>

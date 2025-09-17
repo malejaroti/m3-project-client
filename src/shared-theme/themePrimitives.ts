@@ -346,6 +346,31 @@ export const colorSchemes = {
   },
 };
 
+// Responsive typography styles for forms and components
+export const responsiveStyles = {
+  // Responsive form input styles
+  formInput: {
+    fontSize: '1rem',
+    '@media (min-width: 1800px)': {
+      fontSize: '1.4rem', // Dell monitor (1920px+)
+    },
+    '@media (max-width: 1799px) and (min-width: 1536px)': {
+      fontSize: '1.1rem', // HP laptop (1706px)
+    },
+  },
+  
+  // You can add more responsive styles here
+  formLabel: {
+    fontSize: '0.875rem',
+    '@media (min-width: 1800px)': {
+      fontSize: '1.2rem',
+    },
+    '@media (max-width: 1799px) and (min-width: 1536px)': {
+      fontSize: '1rem',
+    },
+  },
+};
+
 export const typography = {
   fontFamily: 'Inter, sans-serif',
   h1: {

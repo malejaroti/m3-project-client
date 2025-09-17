@@ -6,36 +6,32 @@ import OutlinedInput from '@mui/material/OutlinedInput';
 import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
-import { styled } from '@mui/material/styles';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 // import TextField from "@mui/material/TextField";
 // import FormGroup from "@mui/material/FormGroup";
 // import PhotoCamera from "@mui/icons-material/PhotoCamera";
+import { FormContainer, FormGrid, FormHeader } from './FormSubcomponents/FormStyledSubcomponents';
 
 import React, { useContext, useState } from 'react';
 import type {
   ITimelineItem,
   TimelineItemCreateDTO,
-} from '../pages/TimelineItemsPage';
-import { AuthContext } from '../context/auth.context';
-import ImageUploader from './ImageUploader';
-import api from '../services/config.services';
+} from '../../pages/TimelineItemsPage';
+import { AuthContext } from '../../context/auth.context';
+import ImageUploader from '../ImageUploader';
+import api from '../../services/config.services';
 import { useNavigate } from 'react-router';
 import dayjs, { Dayjs } from 'dayjs';
-
-const FormGrid = styled(Grid)(() => ({
-  display: 'flex',
-  flexDirection: 'column',
-}));
+import { responsiveStyles } from '../../shared-theme/themePrimitives';
 
 export type FormType = 'edit' | 'create' | null; //union
 
 // discriminated union
 type ItemFormProps =
-  | { formType: 'create'; timelineId: string; item?: never; onSuccess: () => void; onRefresh: () => void }
-  | { formType: 'edit'; item: ITimelineItem; timelineId: string; onSuccess: () => void; onRefresh: () => void };
+  | { formType: 'create'; timelineId: string; item?: never; onSuccess: () => void; onRefresh: () => void; onCancel: () => void }
+  | { formType: 'edit'; item: ITimelineItem; timelineId: string; onSuccess: () => void; onRefresh: () => void; onCancel: () => void };
 
 export default function ItemForm(props: ItemFormProps) {
   const authContext = useContext(AuthContext);
@@ -73,10 +69,12 @@ export default function ItemForm(props: ItemFormProps) {
   const [endDateValue, setEndDateValue] = useState<Dayjs | null>(
     props.formType === 'edit' && props.item?.endDate
       ? dayjs(props.item.endDate)
-      : dayjs()
+      : null
   );
   const [oneDayEvent, setOneDayEvent] = useState(
-    formData.startDate === formData.endDate
+    props.formType === 'edit' && props.item
+      ? props.item.startDate === props.item.endDate
+      : false
   );
   const [ongoingEvent, setOngoingEvent] = useState(
     props.formType === 'edit' && props.item?.endDate === ''
@@ -183,7 +181,7 @@ export default function ItemForm(props: ItemFormProps) {
 
     // Build the images array including any newly uploaded image
     const finalImages = uploadedImageUrl
-      ? [ uploadedImageUrl]
+      ? [uploadedImageUrl]
       : formData.images;
 
     const updatedItem = {
@@ -217,149 +215,164 @@ export default function ItemForm(props: ItemFormProps) {
     }
   }
 
-  return (
-    <main className="m-5">
-      <Typography gutterBottom variant="h4" component="div">
-        {props.formType === 'create' ? 'Add a new item' : 'Edit item'}
-      </Typography>
-      <Grid container spacing={3}>
-        <FormGrid size={{ xs: 12, md: 6 }}>
-          <FormLabel htmlFor="first-name" required>
-            Item title
-          </FormLabel>
-          <OutlinedInput
-            id="title"
-            name="title"
-            type="name"
-            placeholder="Title"
-            autoComplete="item title"
-            required
-            size="small"
-            value={formData.title}
-            onChange={handleFormDataChange}
-          />
-        </FormGrid>
+  const handleCancel = () => {
+    // Call the parent's cancel handler to close the drawer/modal
+    props.onCancel();
+  };
 
-        <FormGrid size={{ xs: 12 }}>
-          <FormLabel htmlFor="description" required>
-            Description
-          </FormLabel>
-          <OutlinedInput
-            id="description"
-            name="description"
-            type="description"
-            placeholder="Item description"
-            autoComplete="description"
-            required
-            size="small"
-            multiline
-            value={formData.description}
-            onChange={handleFormDataChange}
-          />
-        </FormGrid>
-        <FormGrid>
-          <FormLabel htmlFor="start-date" required>
-            {oneDayEvent ? 'Date' : ongoingEvent ? 'Start Date (ongoing)' : 'Start Date'}
-          </FormLabel>
-          <LocalizationProvider dateAdapter={AdapterDayjs}>
-            <DatePicker
-              // label="Start date"
-              name="startDate"
-              value={startDateValue}
-              onChange={(newValue) => setStartDateValue(newValue)}
-              // onChange={handleFormDataChange}
-              slotProps={{ textField: { fullWidth: true, id: 'start-date' } }}
+  return (
+    <>
+      <FormHeader>
+        <Typography gutterBottom variant="h4" component="div">
+          {props.formType === 'create' ? '➕ Add a new item' : ' ✒️ Edit item'}
+        </Typography>
+      </FormHeader>
+
+      <FormContainer>
+        <Grid container spacing={3}>
+          <FormGrid size={{ xs: 12, md: 6 }}>
+            <FormLabel htmlFor="first-name" required sx={responsiveStyles.formLabel}>
+              Item title
+            </FormLabel>
+            <OutlinedInput
+              id="title"
+              name="title"
+              type="name"
+              placeholder="Title"
+              autoComplete="item title"
+              required
+              size="small"
+              sx={responsiveStyles.formInput}
+              value={formData.title}
+              onChange={handleFormDataChange}
             />
-          </LocalizationProvider>
-          <FormControlLabel
-            control={
-              <Checkbox
-                checked={oneDayEvent}
-                onChange={(_event, checked) => {
-                  setOneDayEvent(checked);
-                  if (checked) setOngoingEvent(false); // Can't be both one-day and ongoing
-                }}
-              // sx={allDayEvent ? { display: "inline-block" } : { display: "none" }}
-              />
-            }
-            label="One day event"
-          />
-          <FormControlLabel
-            control={
-              <Checkbox
-                checked={ongoingEvent}
-                onChange={(_event, checked) => {
-                  setOngoingEvent(checked);
-                  if (checked) setOneDayEvent(false); // Can't be both ongoing and one-day
-                }}
-              />
-            }
-            label="Ongoing event (no end date yet)"
-          />
-        </FormGrid>
-        {!oneDayEvent && !ongoingEvent && (
-          <FormGrid>
-            <FormLabel htmlFor="end-date" required>
-              End Date
+          </FormGrid>
+
+          <FormGrid size={{ xs: 12 }}>
+            <FormLabel htmlFor="description" required sx={responsiveStyles.formLabel}>
+              Description
+            </FormLabel>
+            <OutlinedInput
+              id="description"
+              name="description"
+              type="description"
+              placeholder="Item description"
+              autoComplete="description"
+              required
+              size="small"
+              sx={responsiveStyles.formInput}
+              multiline
+              value={formData.description}
+              onChange={handleFormDataChange}
+            />
+          </FormGrid>
+          {/* <div>
+          
+        </div> */}
+          <FormGrid className=''>
+            <FormLabel htmlFor="start-date" required sx={responsiveStyles.formLabel}>
+              {oneDayEvent ? 'Date' : ongoingEvent ? 'Start Date (ongoing)' : 'Start Date'}
             </FormLabel>
             <LocalizationProvider dateAdapter={AdapterDayjs}>
               <DatePicker
-                // label="End date"
-                name="EndDate"
-                value={endDateValue}
-                onChange={(newValue) => setEndDateValue(newValue)}
-                slotProps={{ textField: { fullWidth: true, id: 'end-date' } }}
-              // sx={allDayEvent ? { display: "inline-block" } : { display: "none" }}
+                // label="Start date"
+                name="startDate"
+                value={startDateValue}
+                onChange={(newValue) => setStartDateValue(newValue)}
+                // onChange={handleFormDataChange}
+                slotProps={{ textField: { fullWidth: true, id: 'start-date' } }}
               />
             </LocalizationProvider>
           </FormGrid>
-        )}
-        <FormGrid size={{ xs: 12 }}>
-          <ImageUploader onFileSelect={setFile} itemImage={props.item?.images[0]}/>
-        </FormGrid>
-        {/* <FormGrid >
-              <TextField
-                  
-                  required
-                  multiline
-                  id="outlined-required"
-                  label="Moment title"
-                  defaultValue="Hello World"
-                  value={formData.description}
-              />
-          </FormGrid> */}
-      </Grid>
 
-      <Box
-        component="form"
-        sx={{
-          display: 'flex',
-          flexDirection: 'row',
-          alignItems: 'center',
-          justifyContent: 'space-evenly',
-          marginTop: { xs: 2, sm: 5, md: 10 },
-        }}
-        className=''
-      >
-        <Button
-          variant="contained"
-          type="button"
-          size="medium"
-          disabled
-        // onClick={props.formType === "create" ? handleSubmit : handleItemUpdate}
+          {!oneDayEvent && !ongoingEvent && (
+            <FormGrid>
+              <FormLabel htmlFor="end-date" required sx={responsiveStyles.formLabel}>
+                End Date
+              </FormLabel>
+              <LocalizationProvider dateAdapter={AdapterDayjs}>
+                <DatePicker
+                  // label="End date"
+                  name="EndDate"
+                  value={endDateValue}
+                  onChange={(newValue) => setEndDateValue(newValue)}
+                  slotProps={{ textField: { fullWidth: true, id: 'end-date' } }}
+                // sx={allDayEvent ? { display: "inline-block" } : { display: "none" }}
+                />
+              </LocalizationProvider>
+            </FormGrid>
+          )}
+          <FormGrid className='items-left ml-[3px]'>
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={oneDayEvent}
+                  onChange={(_event, checked) => {
+                    setOneDayEvent(checked);
+                    if (checked) setOngoingEvent(false); // Can't be both one-day and ongoing
+                  }}
+                />
+              }
+              label="One day event"
+              sx={{
+                '& .MuiFormControlLabel-label': responsiveStyles.formLabel
+              }}
+            />
+
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={ongoingEvent}
+                  onChange={(_event, checked) => {
+                    setOngoingEvent(checked);
+                    if (checked) setOneDayEvent(false); // Can't be both ongoing and one-day
+                  }}
+                />
+              }
+              label="Ongoing event (no end date yet)"
+              sx={{
+                '& .MuiFormControlLabel-label': responsiveStyles.formLabel,
+                alignSelf: 'flex-end'
+              }}
+            />
+          </FormGrid>
+
+          {/* Image uploader */}
+          <FormGrid size={{ xs: 12 }}>
+            <ImageUploader onFileSelect={setFile} itemImage={props.item?.images[0]} />
+          </FormGrid>
+        </Grid>
+
+        <Box
+          component="form"
+          sx={{
+            display: 'flex',
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'space-evenly',
+            marginTop: { xs: 2, sm: 5, md: 10 },
+          }}
+          className=''
         >
-          Cancel
-        </Button>
-        <Button
-          variant="contained"
-          type="submit"
-          size="medium"
-          onClick={props.formType === "create" ? handleSubmit : handleItemUpdate}
-          loading={isUploading}
-        >
-          {props.formType === 'create' ? 'Create item' : 'Save changes'}
-        </Button>
-      </Box>
-    </main>
+          <Button
+            variant="outlined"
+            type="button"
+            size="medium"
+            onClick={handleCancel}
+          >
+            Cancel
+          </Button>
+          <Button
+            variant="contained"
+            type="submit"
+            size="medium"
+            onClick={props.formType === "create" ? handleSubmit : handleItemUpdate}
+            loading={isUploading}
+          >
+            {props.formType === 'create' ? 'Create item' : 'Save changes'}
+          </Button>
+        </Box>
+      </FormContainer>
+    </>
   );
 }
