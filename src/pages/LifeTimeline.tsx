@@ -29,7 +29,7 @@ function LifeTimeline() {
     const itemsDSRef = useRef<DataSet<VisTimelineItem> | null>(null);
     const groupsDSRef = useRef<DataSet<DataGroup> | null>(null);
     const rootsMapRef = useRef<Map<Element, Root>>(new Map());
-    const isItemImageVisible = true
+    const isItemImageVisible = false
 
 
     const navigate = useNavigate()
@@ -67,7 +67,7 @@ function LifeTimeline() {
                     group: timelineIndex + 1, // Each timeline gets its own group
                     // className: `timeline-group-${timelineIndex + 1}`, // Add custom class
                     // style: `--item-color: ${timelinesWithItems[timelineIndex].timelineColor}`, // Add inline CSS variable
-                    style: `--item-color: #e7e4d7; border: 1px solid black`, // Add inline CSS variable
+                    style: `--item-color: #e7e4d7; border: 0.5px solid #d4d4d4`, // Add inline CSS variable
 
                 };
             })
