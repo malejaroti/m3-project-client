@@ -32,6 +32,7 @@ export default function TransitionsModal() {
         open={open}
         onClose={handleClose}
         closeAfterTransition
+        disableRestoreFocus
         slots={{ backdrop: Backdrop }}
         slotProps={{
           backdrop: {

@@ -40,3 +40,10 @@
 .read-the-docs {
   color: #888;
 } */
+
+/* Timeline containers */
+.timelines-container {
+  display: flex;
+  gap: 2rem;
+  margin-top: 1.25rem;
+}
