@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import api from '../services/config.services';
 import Typography from '@mui/material/Typography';
 import { Link } from 'react-router';
@@ -7,6 +7,8 @@ import Button from '@mui/material/Button';
 import Drawer from '@mui/material/Drawer';
 import AddButton from '../components/AddButton';
 import type { DrawerPosition, DrawerState } from './TimelineItemsPage';
+import TimelineForm from '../components/TimelineForm';
+import type { FormType } from '../components/ItemForm';
 
 export interface ITimeline {
   _id: string;
@@ -14,18 +16,26 @@ export interface ITimeline {
   title: string;
   icon?: string;
   description?: string;
-  startDate?: string;
-  endDate?: string;
+  startDate?: string; // calculated in backend
+  endDate?: string;   // calculated in backend
   collaborators?: string[];
   isPublic: boolean;
   color?: string;
-  createdAt: string;
-  updatedAt: string;
+  createdAt: string; // ISO timestamp
+  updatedAt: string; // ISO timestamp
 }
+
+// DTO for creating a new item (exclude server-managed fields)
+export type TimelineCreateDTO = Omit<
+  ITimeline,
+  '_id' | 'startDate' | 'endDtate' | 'startDate' | 'createdAt' | 'updatedAt'
+>;
 
 function TimelinesPage() {
   const [userTimelines, setUserTimelines] = useState<ITimeline[]>([]);
   const [collaborationTimelines, setCollaborationTimelines] = useState<ITimeline[]>([]);
+  const [selectedTimelineItem, setSelectedTimeline] = useState<ITimeline | null>(null);
+  const [formType, setFormType] = useState<FormType>(null);
   const [drawerState, setDrawerState] = useState<DrawerState>({
     position: 'right',
     open: false,
@@ -55,6 +65,15 @@ function TimelinesPage() {
       console.log(error);
     }
   };
+    const openDrawerWithCreateForm = useCallback(() => {
+      setFormType('create');
+      setSelectedTimeline(null);
+      setDrawerState((prev) => ({ ...prev, open: true }));
+    }, []);
+
+    const closeDrawer = useCallback(() => {
+      setDrawerState((prev) => ({ ...prev, open: false }));
+    }, []);
 
   return (
     <main className='relative'>
@@ -79,7 +98,7 @@ function TimelinesPage() {
           ))}
         </div>
       </section>
-      <AddButton handleOnClick={() => setDrawerState((prev) => ({ ...prev, open: true}))} buttonLabel='Add new timeline'/>
+      <AddButton onClick={() => openDrawerWithCreateForm()} buttonLabel='Add new timeline'/>
 
       <Drawer
         anchor={drawerState.position}
@@ -92,9 +111,7 @@ function TimelinesPage() {
           },
         }}
       >
-        <div>
-          <p>Hola como vas</p>
-        </div>
+        <TimelineForm formType={"create"} onRefresh={getUserTimelines} onSuccess={closeDrawer}/>
         {/* {formType === 'create' && timelineId && (
           <ItemForm
             formType="create"

@@ -6,13 +6,13 @@ import OutlinedInput from '@mui/material/OutlinedInput';
 import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
-import { styled } from '@mui/material/styles';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 // import TextField from "@mui/material/TextField";
 // import FormGroup from "@mui/material/FormGroup";
 // import PhotoCamera from "@mui/icons-material/PhotoCamera";
+import { FormGrid } from './FormSubcomponents/FormGrid';
 
 import React, { useContext, useState } from 'react';
 import type {
@@ -24,11 +24,7 @@ import ImageUploader from './ImageUploader';
 import api from '../services/config.services';
 import { useNavigate } from 'react-router';
 import dayjs, { Dayjs } from 'dayjs';
-
-const FormGrid = styled(Grid)(() => ({
-  display: 'flex',
-  flexDirection: 'column',
-}));
+import { responsiveStyles } from '../shared-theme/themePrimitives';
 
 export type FormType = 'edit' | 'create' | null; //union
 
@@ -220,13 +216,13 @@ export default function ItemForm(props: ItemFormProps) {
   }
 
   return (
-    <main className="m-5">
+    <main className="m-[20px]">
       <Typography gutterBottom variant="h4" component="div">
-        {props.formType === 'create' ? 'Add a new item' : 'Edit item'}
+        {props.formType === 'create' ? '➕ Add a new item' : ' ✒️ Edit item'}
       </Typography>
       <Grid container spacing={3}>
         <FormGrid size={{ xs: 12, md: 6 }}>
-          <FormLabel htmlFor="first-name" required>
+          <FormLabel htmlFor="first-name" required sx={responsiveStyles.formLabel}>
             Item title
           </FormLabel>
           <OutlinedInput
@@ -237,13 +233,14 @@ export default function ItemForm(props: ItemFormProps) {
             autoComplete="item title"
             required
             size="small"
+            sx={responsiveStyles.formInput}
             value={formData.title}
             onChange={handleFormDataChange}
           />
         </FormGrid>
 
         <FormGrid size={{ xs: 12 }}>
-          <FormLabel htmlFor="description" required>
+          <FormLabel htmlFor="description" required sx={responsiveStyles.formLabel}>
             Description
           </FormLabel>
           <OutlinedInput
@@ -254,13 +251,14 @@ export default function ItemForm(props: ItemFormProps) {
             autoComplete="description"
             required
             size="small"
+            sx={responsiveStyles.formInput}
             multiline
             value={formData.description}
             onChange={handleFormDataChange}
           />
         </FormGrid>
         <FormGrid>
-          <FormLabel htmlFor="start-date" required>
+          <FormLabel htmlFor="start-date" required sx={responsiveStyles.formLabel}>
             {oneDayEvent ? 'Date' : ongoingEvent ? 'Start Date (ongoing)' : 'Start Date'}
           </FormLabel>
           <LocalizationProvider dateAdapter={AdapterDayjs}>
@@ -301,7 +299,7 @@ export default function ItemForm(props: ItemFormProps) {
         </FormGrid>
         {!oneDayEvent && !ongoingEvent && (
           <FormGrid>
-            <FormLabel htmlFor="end-date" required>
+            <FormLabel htmlFor="end-date" required sx={responsiveStyles.formLabel}>
               End Date
             </FormLabel>
             <LocalizationProvider dateAdapter={AdapterDayjs}>

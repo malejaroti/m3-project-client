@@ -113,22 +113,6 @@ function TimelineItemsPage() {
       console.log(error);
     }
   };
-  /* const toggleDrawer =
-    (position: DrawerPosition, open: boolean, formType: FormType) =>
-      (event: React.MouseEvent) => {
-        event.stopPropagation();
-        // if (
-        //   event.type === 'keydown' &&
-        //   ((event as React.KeyboardEvent).key === 'Tab' ||
-        //     (event as React.KeyboardEvent).key === 'Shift')
-        // ) {
-        //   return;
-        // }
-
-        setDrawerState({ ...drawerState, position: position, open: open, formType: formType });
-      };
-  */
-
   // useCallback keeps handler refs stable so children (e.g. <Button/Drawer>) don’t re-render unnecessarily
   // Without useCallback, a new function would be created on every render, which could cause avoidable updates.
   const openDrawerCreate = useCallback((position: DrawerPosition) => {
@@ -301,7 +285,7 @@ function TimelineItemsPage() {
           {/* <FleetTimeline items={timelineItems} timelineTitle={timelineDetails?.title} /> */}
           {/* <SimplerTimelineWidget items={newArr} title={timelineDetails?.title ?? 'test'}/> */}
         </section>
-        <AddButton handleOnClick={() => openDrawerCreate('right')} buttonLabel='Add new item' />
+        <AddButton onClick={() => openDrawerCreate('right')} buttonLabel='Add new item' />
 
 
         <div>

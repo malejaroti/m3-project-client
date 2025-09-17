@@ -1,11 +1,11 @@
 import Button from "@mui/material/Button"
 
 interface AddButtonProps {
-    handleOnClick: () => void;
+    onClick: () => void;
     buttonLabel: string
 }
 
-function AddButton({ handleOnClick, buttonLabel}: AddButtonProps) {
+function AddButton({ onClick, buttonLabel}: AddButtonProps) {
     return (
         <Button
             variant="contained"
@@ -23,7 +23,7 @@ function AddButton({ handleOnClick, buttonLabel}: AddButtonProps) {
                 },
             }}
             // onClick={() => openDrawerCreate('right')}
-            onClick={handleOnClick}
+            onClick={onClick}
         >
             {buttonLabel}
         </Button>
