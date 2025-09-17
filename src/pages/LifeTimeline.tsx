@@ -26,7 +26,6 @@ function LifeTimeline() {
     const itemsDSRef = useRef<DataSet<VisTimelineItem> | null>(null);
     const groupsDSRef = useRef<DataSet<DataGroup> | null>(null);
     const rootsMapRef = useRef<Map<Element, Root>>(new Map());
-    const isItemImageVisible = false
 
     const navigate = useNavigate()
 
@@ -55,7 +54,7 @@ function LifeTimeline() {
                 return {
                     ...item,
                     id: item._id, // Map MongoDB _id to vis-timeline id
-                    content: `<div>${item.title}</div>${isItemImageVisible && item.images && item.images.length > 0 ? `<img src="${item.images[0]}" style="width:32px; height:32px; border-radius: 4px; margin-top: 4px;">` : ''}`,
+                    content: `<div style="background-color: red"> ${item.title} </div>`,
                     start: startDate,
                     end: endDate,
                     group: timelineIndex + 1, // Each timeline gets its own group
@@ -84,6 +83,9 @@ function LifeTimeline() {
                 stack: true,
                 selectable: true,
                 zoomKey: "ctrlKey",
+                xss: {
+                    disabled: true  // Allow HTML content
+                },
                 margin: {
                     item: {
                         horizontal: 10,
