@@ -13,6 +13,7 @@ import "vis-timeline/styles/vis-timeline-graph2d.min.css";
 
 interface ITimelineWithItems {
     timelineTitle: string,
+    timelineColor: string,
     items: ITimelineItem[]
 }
 type VisTimelineItem = DataItem & ITimelineItem
@@ -54,10 +55,14 @@ function LifeTimeline() {
                 return {
                     ...item,
                     id: item._id, // Map MongoDB _id to vis-timeline id
-                    content: `<div style="background-color: red"> ${item.title} </div>`,
+                    content: `<div class="test"> ${item.title} </div>`,
                     start: startDate,
                     end: endDate,
                     group: timelineIndex + 1, // Each timeline gets its own group
+                    className: `timeline-group-${timelineIndex + 1}`, // Add custom class
+                    // style: `--item-color: ${timelinesWithItems[timelineIndex].timelineColor}`, // Add inline CSS variable
+                    // style: `--item-color: pink}`, // Add inline CSS variable
+
                 };
             })
         );
@@ -67,6 +72,41 @@ function LifeTimeline() {
             id: index + 1,
             content: timeline.timelineTitle
         }));
+
+        // Set CSS custom properties for each timeline's color AND create dynamic CSS rules
+        timelinesWithItems.forEach((timeline, index) => {
+            const groupId = index + 1;
+            if (masterTimelineContainerRef.current) {
+                // Set CSS variable
+                masterTimelineContainerRef.current.style.setProperty(
+                    `--timeline-${groupId}-color`,
+                    timeline.timelineColor
+                );
+
+                // Create dynamic CSS rule for this group
+                const cssRule = `.vis-item.timeline-group-${groupId} .vis-item-overflow { 
+                    background-color: var(--timeline-${groupId}-color, #ccc) !important; 
+                }`;
+
+                // Check if style element exists, if not create it
+                let styleElement = document.getElementById('dynamic-timeline-styles') as HTMLStyleElement;
+                if (!styleElement) {
+                    styleElement = document.createElement('style');
+                    styleElement.id = 'dynamic-timeline-styles';
+                    document.head.appendChild(styleElement);
+                }
+
+                // Add the CSS rule
+                if (styleElement.sheet) {
+                    try {
+                        styleElement.sheet.insertRule(cssRule, styleElement.sheet.cssRules.length);
+                    } catch (e) {
+                        // Rule might already exist, that's okay
+                        console.log('CSS rule already exists or invalid:', e);
+                    }
+                }
+            }
+        });
 
         // Initialize DataSets
         itemsDSRef.current = new DataSet<VisTimelineItem>(visTimelineItems);
@@ -140,6 +180,7 @@ function LifeTimeline() {
                     console.log(`response items timeline ${eachTimeline.title}: `, response)
                     return {
                         timelineTitle: eachTimeline.title,
+                        timelineColor: eachTimeline.color || 'gray',
                         items: response.data
                     };
                 });

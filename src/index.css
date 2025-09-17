@@ -98,20 +98,20 @@ button:focus-visible {
   box-shadow: 5px 5px 20px rgba(128, 128, 128, 0.5);
   overflow: visible;
 }
-.vis-item .vis-item-overflow {
+/* .vis-item .vis-item-overflow {
   border-color: #f991a3;
   background-color: rgb(236, 240, 238);
   font-size: 15pt;
   color: purple;
   box-shadow: 5px 5px 20px rgba(128, 128, 128, 0.5);
-}
-.vis-item .vis-item-content {
-  /* border: 3px solid #f991a3; */
+} */
+
+/* .vis-item .vis-item-content {
   background-color: rgb(236, 240, 238);
   font-size: 15pt;
   color: black;
   word-wrap: break-word;
-}
+} */
 
 .vis-item .vis-item-content img {
   width: 80px !important;
