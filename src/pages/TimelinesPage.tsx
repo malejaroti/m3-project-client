@@ -7,7 +7,7 @@ import Button from '@mui/material/Button';
 import Drawer from '@mui/material/Drawer';
 import AddButton from '../components/AddButton';
 import type { DrawerPosition, DrawerState } from './TimelineItemsPage';
-import TimelineForm from '../components/TimelineForm';
+import TimelineForm from '../components/Forms/TimelineForm';
 import type { FormType } from '../components/Forms/ItemForm';
 import { AuthContext } from '../context/auth.context';
 import DeleteModal from '../components/DeleteModal';
