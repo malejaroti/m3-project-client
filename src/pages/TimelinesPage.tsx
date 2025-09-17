@@ -77,7 +77,6 @@ function TimelinesPage() {
   const openDeleteModal = useCallback((timeline: ITimeline) => {
     setSelectedTimeline(timeline);
     setOpenModal(true)
-    // setDrawerState((prev) => ({ ...prev, open: true }));
   }, []);
 
   const openDrawerWithCreateForm = useCallback(() => {
@@ -149,8 +148,8 @@ function TimelinesPage() {
       <Drawer
         anchor={drawerState.position}
         open={drawerState.open}
-        // onClose={closeDrawer}
         onClose={(_, __) => setDrawerState((prev) => ({ ...prev, open: false }))}
+        // onClose={closeDrawer}
         sx={{
           '& .MuiDrawer-paper': {
             width: { xs: '90%', sm: 500, md: 600 },

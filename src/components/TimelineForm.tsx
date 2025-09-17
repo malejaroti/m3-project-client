@@ -159,10 +159,9 @@ type TimelineFormProps =
                     className=''
                 >
                     <Button
-                        variant="contained"
+                        variant="outlined"
                         type="button"
                         size="medium"
-                        disabled
                         sx={responsiveStyles.formInput}
                         onClick={props.onCancel}
                     >

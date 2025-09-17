@@ -141,7 +141,6 @@ function TimelineItemsPage() {
   }
 
   const handleItemDelete = async () => {
-
     try {
       const response = await api.delete(`/timelines/${timelineId}/items/${selectedTimelineItem?._id}`);
       console.log('Res DELETE item: ', response);
@@ -151,6 +150,7 @@ function TimelineItemsPage() {
       navigate('/error');
     }
   }
+
   let newArr = timelineItems.map((item, index) => (
     {
       id: index,
@@ -305,6 +305,7 @@ function TimelineItemsPage() {
                 timelineId={timelineId.toString()}
                 onSuccess={closeDrawer}
                 onRefresh={getTimelineItems}
+                onCancel={closeDrawer}
               />
             )}
 
@@ -315,6 +316,7 @@ function TimelineItemsPage() {
                 timelineId={timelineId.toString()}
                 onSuccess={closeDrawer}
                 onRefresh={getTimelineItems}
+                onCancel={closeDrawer}
               />
             )}
           </Drawer>

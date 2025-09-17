@@ -30,8 +30,8 @@ export type FormType = 'edit' | 'create' | null; //union
 
 // discriminated union
 type ItemFormProps =
-  | { formType: 'create'; timelineId: string; item?: never; onSuccess: () => void; onRefresh: () => void }
-  | { formType: 'edit'; item: ITimelineItem; timelineId: string; onSuccess: () => void; onRefresh: () => void };
+  | { formType: 'create'; timelineId: string; item?: never; onSuccess: () => void; onRefresh: () => void; onCancel: () => void }
+  | { formType: 'edit'; item: ITimelineItem; timelineId: string; onSuccess: () => void; onRefresh: () => void; onCancel: () => void };
 
 export default function ItemForm(props: ItemFormProps) {
   const authContext = useContext(AuthContext);
@@ -215,6 +215,11 @@ export default function ItemForm(props: ItemFormProps) {
     }
   }
 
+  const handleCancel = () => {
+    // Call the parent's cancel handler to close the drawer/modal
+    props.onCancel();
+  };
+
   return (
     <main className="m-[20px]">
       <Typography gutterBottom variant="h4" component="div">
@@ -257,7 +262,10 @@ export default function ItemForm(props: ItemFormProps) {
             onChange={handleFormDataChange}
           />
         </FormGrid>
-        <FormGrid>
+        {/* <div>
+          
+        </div> */}
+        <FormGrid className=''>
           <FormLabel htmlFor="start-date" required sx={responsiveStyles.formLabel}>
             {oneDayEvent ? 'Date' : ongoingEvent ? 'Start Date (ongoing)' : 'Start Date'}
           </FormLabel>
@@ -271,32 +279,8 @@ export default function ItemForm(props: ItemFormProps) {
               slotProps={{ textField: { fullWidth: true, id: 'start-date' } }}
             />
           </LocalizationProvider>
-          <FormControlLabel
-            control={
-              <Checkbox
-                checked={oneDayEvent}
-                onChange={(_event, checked) => {
-                  setOneDayEvent(checked);
-                  if (checked) setOngoingEvent(false); // Can't be both one-day and ongoing
-                }}
-              // sx={allDayEvent ? { display: "inline-block" } : { display: "none" }}
-              />
-            }
-            label="One day event"
-          />
-          <FormControlLabel
-            control={
-              <Checkbox
-                checked={ongoingEvent}
-                onChange={(_event, checked) => {
-                  setOngoingEvent(checked);
-                  if (checked) setOneDayEvent(false); // Can't be both ongoing and one-day
-                }}
-              />
-            }
-            label="Ongoing event (no end date yet)"
-          />
         </FormGrid>
+
         {!oneDayEvent && !ongoingEvent && (
           <FormGrid>
             <FormLabel htmlFor="end-date" required sx={responsiveStyles.formLabel}>
@@ -314,20 +298,45 @@ export default function ItemForm(props: ItemFormProps) {
             </LocalizationProvider>
           </FormGrid>
         )}
+        <FormGrid className='items-left ml-[3px]'>
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={oneDayEvent}
+                onChange={(_event, checked) => {
+                  setOneDayEvent(checked);
+                  if (checked) setOngoingEvent(false); // Can't be both one-day and ongoing
+                }}
+              />
+            }
+            label="One day event"
+            sx={{
+              '& .MuiFormControlLabel-label': responsiveStyles.formLabel
+            }}
+          />
+
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={ongoingEvent}
+                onChange={(_event, checked) => {
+                  setOngoingEvent(checked);
+                  if (checked) setOneDayEvent(false); // Can't be both ongoing and one-day
+                }}
+              />
+            }
+            label="Ongoing event (no end date yet)"
+            sx={{
+              '& .MuiFormControlLabel-label': responsiveStyles.formLabel,
+              alignSelf: 'flex-end'
+            }}
+          />
+        </FormGrid>
+
+        {/* Image uploader */}
         <FormGrid size={{ xs: 12 }}>
           <ImageUploader onFileSelect={setFile} itemImage={props.item?.images[0]} />
         </FormGrid>
-        {/* <FormGrid >
-              <TextField
-                  
-                  required
-                  multiline
-                  id="outlined-required"
-                  label="Moment title"
-                  defaultValue="Hello World"
-                  value={formData.description}
-              />
-          </FormGrid> */}
       </Grid>
 
       <Box
@@ -342,11 +351,10 @@ export default function ItemForm(props: ItemFormProps) {
         className=''
       >
         <Button
-          variant="contained"
+          variant="outlined"
           type="button"
           size="medium"
-          disabled
-        // onClick={props.formType === "create" ? handleSubmit : handleItemUpdate}
+          onClick={handleCancel}
         >
           Cancel
         </Button>
