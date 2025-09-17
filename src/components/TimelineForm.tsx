@@ -17,12 +17,14 @@ type TimelineFormProps =
         formType: "create";
         timeline?: never;
         onSuccess: () => void; 
+        onCancel: () => void; 
         onRefresh: () => void
     }
     | {
         formType: "edit";
         timeline: ITimeline
-        onSuccess: () => void; 
+        onSuccess: () => void;
+        onCancel: () => void;  
         onRefresh: () => void
     }
 
@@ -162,7 +164,7 @@ type TimelineFormProps =
                         size="medium"
                         disabled
                         sx={responsiveStyles.formInput}
-                    // onClick={props.formType === "create" ? handleSubmit : handleTimelineUpdate}
+                        onClick={props.onCancel}
                     >
                         Cancel
                     </Button>

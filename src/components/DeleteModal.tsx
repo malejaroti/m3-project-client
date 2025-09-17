@@ -7,7 +7,7 @@ import Typography from "@mui/material/Typography"
 
 type DeleteModalProps = {
     modalState: boolean,
-    // modalStateSetter: () => void
+    modalMessage: string
     modalStateSetter: (value: boolean) => void
     handleDelete: () => void
 }
@@ -24,16 +24,16 @@ const styleModalBox = {
     p: 4,
 };
 
-function DeleteModal({ modalState, modalStateSetter, handleDelete }: DeleteModalProps) {
+function DeleteModal(props: DeleteModalProps) {
     const handleClose = () => {
-        modalStateSetter(false);
+        props.modalStateSetter(false);
     };
 
     return (
         <Modal
             aria-labelledby="transition-modal-title"
             aria-describedby="transition-modal-description"
-            open={modalState}
+            open={props.modalState}
             onClose={handleClose}
             closeAfterTransition
             disableRestoreFocus
@@ -44,26 +44,22 @@ function DeleteModal({ modalState, modalStateSetter, handleDelete }: DeleteModal
                 },
             }}
         >
-            <Fade in={modalState}>
+            <Fade in={props.modalState}>
                 <Box sx={styleModalBox} className='flex flex-col gap-5'>
                     <div>
                         <Typography id="transition-modal-title" variant="h6" component="h2">
                             Are you sure?
                         </Typography>
                         <Typography id="transition-modal-description" sx={{ mt: 2 }}>
-                            Are you sure you want to delete this item?
-                            This action cannot be undone.
+                            Are you sure you want to delete this {props.modalMessage}?<br />
+                            <b>This action cannot be undone.</b>
                         </Typography>
                     </div>
 
                     <div className='flex gap-10 '>
                         <Button variant='outlined' onClick={handleClose}>Cancel</Button>
-                        <Button variant='contained' onClick={handleDelete}>Delete</Button>
+                        <Button variant='contained' color='error' onClick={props.handleDelete}>Delete</Button>
                     </div>
-                    {/* <Box>
-                <Button>Cancel</Button>
-                <Button>Delete</Button>
-                </Box> */}
                 </Box>
             </Fade>
         </Modal>

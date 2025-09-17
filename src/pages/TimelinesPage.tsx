@@ -1,7 +1,7 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useContext, useEffect, useState } from 'react';
 import api from '../services/config.services';
 import Typography from '@mui/material/Typography';
-import { Link } from 'react-router';
+import { Link, useNavigate } from 'react-router';
 import TimelineCard from '../components/TimelineCard';
 import Button from '@mui/material/Button';
 import Drawer from '@mui/material/Drawer';
@@ -9,6 +9,8 @@ import AddButton from '../components/AddButton';
 import type { DrawerPosition, DrawerState } from './TimelineItemsPage';
 import TimelineForm from '../components/TimelineForm';
 import type { FormType } from '../components/ItemForm';
+import { AuthContext } from '../context/auth.context';
+import DeleteModal from '../components/DeleteModal';
 
 export interface ITimeline {
   _id: string;
@@ -32,14 +34,21 @@ export type TimelineCreateDTO = Omit<
 >;
 
 function TimelinesPage() {
+  const authContext = useContext(AuthContext);
+  if (!authContext) {
+    throw new Error('Timeline creation must be done within an AuthWrapper');
+  }
+  const { loggedUserId } = authContext;
   const [userTimelines, setUserTimelines] = useState<ITimeline[]>([]);
   const [collaborationTimelines, setCollaborationTimelines] = useState<ITimeline[]>([]);
-  const [selectedTimelineItem, setSelectedTimeline] = useState<ITimeline | null>(null);
+  const [selectedTimeline, setSelectedTimeline] = useState<ITimeline | null>(null);
   const [formType, setFormType] = useState<FormType>(null);
+  const [openModal, setOpenModal] = useState(false);
   const [drawerState, setDrawerState] = useState<DrawerState>({
     position: 'right',
     open: false,
   });
+  const navigate = useNavigate()
 
 
   useEffect(() => {
@@ -50,7 +59,7 @@ function TimelinesPage() {
   const getUserTimelines = async () => {
     try {
       const response = await api.get('/timelines');
-      // console.log("timelines", response)
+      // console.log("user timelines", response)
       setUserTimelines(response.data);
     } catch (error) {
       console.log(error);
@@ -59,21 +68,47 @@ function TimelinesPage() {
   const getCollaborationTimelines = async () => {
     try {
       const response = await api.get('/timelines/collaborations');
-      console.log('timelines collaborations', response);
+      // console.log('timelines collaborations', response);
       setCollaborationTimelines(response.data);
     } catch (error) {
       console.log(error);
     }
   };
-    const openDrawerWithCreateForm = useCallback(() => {
-      setFormType('create');
-      setSelectedTimeline(null);
-      setDrawerState((prev) => ({ ...prev, open: true }));
-    }, []);
+  const openDeleteModal = useCallback((timeline: ITimeline) => {
+    setSelectedTimeline(timeline);
+    setOpenModal(true)
+    // setDrawerState((prev) => ({ ...prev, open: true }));
+  }, []);
 
-    const closeDrawer = useCallback(() => {
-      setDrawerState((prev) => ({ ...prev, open: false }));
-    }, []);
+  const openDrawerWithCreateForm = useCallback(() => {
+    setFormType('create');
+    setSelectedTimeline(null);
+    setDrawerState((prev) => ({ ...prev, open: true }));
+  }, []);
+
+  const openDrawerWithEditForm = useCallback(
+    (timeline: ITimeline) => {
+      setFormType('edit');
+      setSelectedTimeline(timeline);
+      setDrawerState((prev) => ({ ...prev, open: true }));
+    },
+    []
+  );
+
+  const closeDrawer = useCallback(() => {
+    setDrawerState((prev) => ({ ...prev, open: false }));
+  }, []);
+
+  const handleTimelineDelete = async () => {
+    try {
+      const response = await api.delete(`/timelines/${selectedTimeline?._id}`);
+      console.log('Res DELETE item: ', response);
+      getUserTimelines()
+      setOpenModal(false)
+    } catch (error) {
+      navigate('/error');
+    }
+  }
 
   return (
     <main className='relative'>
@@ -84,7 +119,13 @@ function TimelinesPage() {
         <div className="timelines-container border">
           {userTimelines.map((timeline) => (
             // {console.log(timeline)}
-            <TimelineCard timeline={timeline} />
+            <TimelineCard
+              key={timeline._id}
+              timelineOnwer={timeline.owner === loggedUserId ? "loggedUser" : "collaborator"}
+              timeline={timeline}
+              onClickEditButton={() => openDrawerWithEditForm(timeline)}
+              handleClickOnDeleteButton={() => openDeleteModal(timeline)}
+            />
           ))}
         </div>
       </section>
@@ -93,12 +134,17 @@ function TimelinesPage() {
           Collaboration timelines
         </Typography>
         <div className="timelines-container">
+
           {collaborationTimelines.map((timeline) => (
-            <TimelineCard timeline={timeline} />
+            <TimelineCard
+              key={timeline._id}
+              timelineOnwer="collaborator"
+              timeline={timeline}
+              onClickEditButton={() => openDrawerWithEditForm(timeline)} />
           ))}
         </div>
       </section>
-      <AddButton onClick={() => openDrawerWithCreateForm()} buttonLabel='Add new timeline'/>
+      <AddButton onClick={() => openDrawerWithCreateForm()} buttonLabel='Add new timeline' />
 
       <Drawer
         anchor={drawerState.position}
@@ -111,26 +157,27 @@ function TimelinesPage() {
           },
         }}
       >
-        <TimelineForm formType={"create"} onRefresh={getUserTimelines} onSuccess={closeDrawer}/>
-        {/* {formType === 'create' && timelineId && (
-          <ItemForm
+        {formType === 'create' && (
+          <TimelineForm
             formType="create"
-            timelineId={timelineId.toString()}
             onSuccess={closeDrawer}
-            onRefresh={getTimelineItems}
+            onRefresh={getUserTimelines}
+            onCancel={closeDrawer}
           />
         )}
 
-        {formType === 'edit' && selectedTimelineItem && timelineId && (
-          <ItemForm
+        {formType === 'edit' && selectedTimeline && (
+          <TimelineForm
             formType="edit"
-            item={selectedTimelineItem}
-            timelineId={timelineId.toString()}
+            timeline={selectedTimeline}
             onSuccess={closeDrawer}
-            onRefresh={getTimelineItems}
+            onRefresh={getUserTimelines}
+            onCancel={closeDrawer}
+
           />
-        )} */}
+        )}
       </Drawer>
+      <DeleteModal modalState={openModal} modalStateSetter={setOpenModal} handleDelete={handleTimelineDelete} modalMessage={"timeline"} />
     </main>
   );
 }
