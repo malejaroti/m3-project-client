@@ -11,6 +11,7 @@ import TimelineForm from '../components/Forms/TimelineForm';
 import type { FormType } from '../components/Forms/ItemForm';
 import { AuthContext } from '../context/auth.context';
 import DeleteModal from '../components/DeleteModal';
+import { CardsContainer } from '../components/styled/CardsContainer'
 
 export interface ITimeline {
   _id: string;
@@ -110,12 +111,12 @@ function TimelinesPage() {
   }
 
   return (
-    <main className='relative'>
+    <main className='relative flex flex-col gap-8'>
       <section className="user-timelines">
         <Typography variant="h4" component="h2">
           My timelines
         </Typography>
-        <div className="timelines-container border">
+        <CardsContainer>
           {userTimelines.map((timeline) => (
             // {console.log(timeline)}
             <TimelineCard
@@ -126,14 +127,13 @@ function TimelinesPage() {
               handleClickOnDeleteButton={() => openDeleteModal(timeline)}
             />
           ))}
-        </div>
+        </CardsContainer>
       </section>
       <section className="collaboration-timelines">
         <Typography variant="h4" component="h2">
           Collaboration timelines
         </Typography>
-        <div className="timelines-container">
-
+        <CardsContainer>
           {collaborationTimelines.map((timeline) => (
             <TimelineCard
               key={timeline._id}
@@ -141,7 +141,7 @@ function TimelinesPage() {
               timeline={timeline}
               onClickEditButton={() => openDrawerWithEditForm(timeline)} />
           ))}
-        </div>
+        </CardsContainer>
       </section>
       <AddButton onClick={() => openDrawerWithCreateForm()} buttonLabel='Add new timeline' />
 

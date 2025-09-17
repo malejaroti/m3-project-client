@@ -28,8 +28,7 @@ type TimelineFormProps =
         onRefresh: () => void
     }
 
-
-function TimelineForm(props: TimelineFormProps) {
+    function TimelineForm(props: TimelineFormProps) {
     const authContext = useContext(AuthContext);
     if (!authContext) {
         throw new Error('Timeline creation must be done within an AuthWrapper');
