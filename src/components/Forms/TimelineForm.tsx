@@ -1,5 +1,5 @@
 import Typography from "@mui/material/Typography"
-import { FormContainer, FormGrid, FormHeader } from "./FormSubcomponents/FormGrid"
+import { FormContainer, FormGrid, FormHeader } from "./FormSubcomponents/FormStyledSubcomponents"
 import type { ITimeline, TimelineCreateDTO } from "../../pages/TimelinesPage"
 import FormLabel from "@mui/material/FormLabel"
 import OutlinedInput from "@mui/material/OutlinedInput"
@@ -16,27 +16,27 @@ type TimelineFormProps =
     | {
         formType: "create";
         timeline?: never;
-        onSuccess: () => void; 
-        onCancel: () => void; 
+        onSuccess: () => void;
+        onCancel: () => void;
         onRefresh: () => void
     }
     | {
         formType: "edit";
         timeline: ITimeline
         onSuccess: () => void;
-        onCancel: () => void;  
+        onCancel: () => void;
         onRefresh: () => void
     }
 
-    
-    function TimelineForm(props: TimelineFormProps) {
-        const authContext = useContext(AuthContext);
-        if (!authContext) {
-            throw new Error('Timeline creation must be done within an AuthWrapper');
-        }
-        const { loggedUserId } = authContext;
 
-        const newTimelineData: TimelineCreateDTO = {
+function TimelineForm(props: TimelineFormProps) {
+    const authContext = useContext(AuthContext);
+    if (!authContext) {
+        throw new Error('Timeline creation must be done within an AuthWrapper');
+    }
+    const { loggedUserId } = authContext;
+
+    const newTimelineData: TimelineCreateDTO = {
         owner: loggedUserId !== null ? loggedUserId : '',
         title: '',
         description: '',
@@ -44,62 +44,62 @@ type TimelineFormProps =
         collaborators: [],
         isPublic: false,
         color: "gray"
-        };
+    };
 
-        const [formData, setFormData] = useState<TimelineCreateDTO>( 
-            props.formType === "create"
-            ? {...newTimelineData}
-            : {...props.timeline}
-        );
-        const navigate = useNavigate();
+    const [formData, setFormData] = useState<TimelineCreateDTO>(
+        props.formType === "create"
+            ? { ...newTimelineData }
+            : { ...props.timeline }
+    );
+    const navigate = useNavigate();
 
-        const handleFormDataChange = (
+    const handleFormDataChange = (
         event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-        ) => {
+    ) => {
         const { name, value } = event.currentTarget;
         setFormData((prev) => ({
             ...prev,
             [name]: value,
         }));
-        };
+    };
 
-        const handleTimelineUpdate = async (event: React.FormEvent) => {
-            event.preventDefault();
-            const updatedTimeline = {
+    const handleTimelineUpdate = async (event: React.FormEvent) => {
+        event.preventDefault();
+        const updatedTimeline = {
             ...formData,
-            };
-            console.log('Updates for timeline: ', updatedTimeline);
+        };
+        console.log('Updates for timeline: ', updatedTimeline);
 
-            try {
-            const response = await api.put(`/timelines/${props.timeline?._id}`, updatedTimeline );
+        try {
+            const response = await api.put(`/timelines/${props.timeline?._id}`, updatedTimeline);
             console.log('Res PUT updated timeline: ', response);
 
             // Call the success callbacks
             props.onRefresh(); // Refresh the timelines
             props.onSuccess(); // Close the drawer
-            } catch (error) {
+        } catch (error) {
             navigate('/error');
-            }
-        };
-        const handleSubmit = async (event: React.FormEvent) => {
-            event.preventDefault();
-            const newTimeline = {
+        }
+    };
+    const handleSubmit = async (event: React.FormEvent) => {
+        event.preventDefault();
+        const newTimeline = {
             ...formData,
-            };
-            console.log('new timeline: ', newTimeline);
+        };
+        console.log('new timeline: ', newTimeline);
 
-            try {
-            const response = await api.post(`/timelines`, newTimeline );
+        try {
+            const response = await api.post(`/timelines`, newTimeline);
             console.log('Res POST new timeline: ', response);
 
             // Call the success callbacks
             props.onRefresh(); // Refresh the timelines
             props.onSuccess(); // Close the drawer
-            } catch (error) {
+        } catch (error) {
             navigate('/error');
-            }
-        };
-        
+        }
+    };
+
     return (
         <>
             <FormHeader>
@@ -172,7 +172,7 @@ type TimelineFormProps =
                         type="submit"
                         size="medium"
                         sx={responsiveStyles.formInput}
-                      onClick={props.formType === "create" ? handleSubmit : handleTimelineUpdate}
+                        onClick={props.formType === "create" ? handleSubmit : handleTimelineUpdate}
                     // loading={isUploading}
                     >
                         {props.formType === 'create' ? 'Create item' : 'Save changes'}
