@@ -1,15 +1,15 @@
 import Typography from "@mui/material/Typography"
-import { FormContainer, FormGrid } from "./FormSubcomponents/FormGrid"
-import type { ITimeline, TimelineCreateDTO } from "../pages/TimelinesPage"
+import { FormContainer, FormGrid, FormHeader } from "./FormSubcomponents/FormGrid"
+import type { ITimeline, TimelineCreateDTO } from "../../pages/TimelinesPage"
 import FormLabel from "@mui/material/FormLabel"
 import OutlinedInput from "@mui/material/OutlinedInput"
 import Grid from "@mui/material/Grid"
 import Button from "@mui/material/Button"
 import Box from "@mui/material/Box"
-import { responsiveStyles } from "../shared-theme/themePrimitives"
+import { responsiveStyles } from "../../shared-theme/themePrimitives"
 import { useContext, useState } from "react"
-import { AuthContext } from "../context/auth.context"
-import api from "../services/config.services"
+import { AuthContext } from "../../context/auth.context"
+import api from "../../services/config.services"
 import { useNavigate } from "react-router"
 
 type TimelineFormProps =
@@ -102,11 +102,11 @@ type TimelineFormProps =
         
     return (
         <>
-            <div className="bg-slate-300 h-[100px] flex items-center p-[10px]">
+            <FormHeader>
                 <Typography gutterBottom variant="h4" component="div">
                     {props.formType === 'create' ? '➕ Add a new timeline' : '✒️ Edit Timeline'}
                 </Typography>
-            </div>
+            </FormHeader>
             <FormContainer>
                 <Grid container spacing={3} className="">
                     <FormGrid size={{ xs: 12, md: 6 }}>

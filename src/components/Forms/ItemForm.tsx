@@ -12,7 +12,7 @@ import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 // import TextField from "@mui/material/TextField";
 // import FormGroup from "@mui/material/FormGroup";
 // import PhotoCamera from "@mui/icons-material/PhotoCamera";
-import { FormGrid } from './FormSubcomponents/FormGrid';
+import { FormContainer, FormGrid, FormHeader } from './FormSubcomponents/FormGrid';
 
 import React, { useContext, useState } from 'react';
 import type {
@@ -221,10 +221,14 @@ export default function ItemForm(props: ItemFormProps) {
   };
 
   return (
-    <main className="m-[20px]">
+    <>
+    <FormHeader>
       <Typography gutterBottom variant="h4" component="div">
         {props.formType === 'create' ? '➕ Add a new item' : ' ✒️ Edit item'}
       </Typography>
+    </FormHeader>
+    
+    <FormContainer>
       <Grid container spacing={3}>
         <FormGrid size={{ xs: 12, md: 6 }}>
           <FormLabel htmlFor="first-name" required sx={responsiveStyles.formLabel}>
@@ -368,6 +372,7 @@ export default function ItemForm(props: ItemFormProps) {
           {props.formType === 'create' ? 'Create item' : 'Save changes'}
         </Button>
       </Box>
-    </main>
+    </FormContainer>
+    </>
   );
 }

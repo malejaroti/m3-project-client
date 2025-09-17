@@ -18,6 +18,16 @@ export const FormContainer = styled(Box)(() => ({
 
 }))
 
+export const FormHeader = styled(Box)(() => ({
+  display: 'flex',
+  alignItems: 'center',
+  background: '#cad5e2',
+  height:'100px',
+  padding:'10px'
+  // bg-slate-300 h-[100px] flex items-center p-[10px]
+
+}))
+
 
 export const FormTitle = styled(Typography)(() => ({
 
