@@ -24,6 +24,7 @@ type VisTimelineItem = DataItem & ITimelineItem
 function LifeTimeline() {
     const [timelinesWithItems, setTimelinesWithItems] = useState<ITimelineWithItems[]>();
     const [timelines, setTimelines] = useState<ITimeline[]>([]);
+    const [selectedItem, setSelectedItem] = useState<ITimelineItem | null>(null);
     const masterTimelineContainerRef = useRef<HTMLDivElement | null>(null);
     const timelineRef = useRef<Timeline | null>(null);
     const itemsDSRef = useRef<DataSet<VisTimelineItem> | null>(null);
@@ -86,7 +87,7 @@ function LifeTimeline() {
                 // Set CSS variable
                 masterTimelineContainerRef.current.style.setProperty(
                     `--timeline-${groupId}-color`,
-                    getTimelineColor(index, {groupId})
+                    getTimelineColor(index, { groupId })
                     // " rgba(255, 192, 203, 0.5)"
                 );
 
@@ -157,6 +158,21 @@ function LifeTimeline() {
             }
         );
 
+        // Add selection event handler
+        timelineRef.current.on('select', (properties) => {
+            if (properties.items.length > 0) {
+                const selectedItemId = properties.items[0];
+                // Find the selected item in our data
+                const foundItem = timelinesWithItems.flatMap(timeline => timeline.items)
+                    .find(item => item._id === selectedItemId);
+                if (foundItem) {
+                    setSelectedItem(foundItem);
+                }
+            } else {
+                setSelectedItem(null);
+            }
+        });
+
         // Add resize observer for responsive behavior
         const ro = new ResizeObserver(() => timelineRef.current?.redraw());
         ro.observe(masterTimelineContainerRef.current);
@@ -219,12 +235,106 @@ function LifeTimeline() {
 
     return (
         <>
-            <Typography variant="h3">My Life Timeline</Typography>
-            <div
-                className="master-timeline mt-5 h-[calc(100vh-250px)] bg-gradient-to-b from-blue-500 to-yellow-500 overflow-y-scroll"
-                ref={masterTimelineContainerRef}
-                style={{ width: "100%", minHeight: "600px" }}
-            />
+            <Typography variant="h3" className="mb-4">My Life Timeline</Typography>
+            <div className="flex gap-4 h-[calc(100vh-200px)]">
+                {/* Timeline Container */}
+                <div
+                    className="master-timeline flex-1 bg-gradient-to-b from-blue-500 to-yellow-500 overflow-y-scroll rounded-lg"
+                    ref={masterTimelineContainerRef}
+                    style={{ minHeight: "600px" }}
+                />
+
+                {/* Details Box */}
+                <div className="w-80 bg-white border border-gray-300 rounded-lg shadow-lg p-4 overflow-y-auto">
+                    <Typography variant="h5" className="mb-3 text-gray-800">
+                        {selectedItem ? 'Item Details' : 'Select an Item'}
+                    </Typography>
+
+                    {selectedItem ? (
+                        <div className="space-y-4">
+                            {/* Title */}
+                            <div>
+                                <Typography variant="h6" className="font-semibold text-gray-900">
+                                    {selectedItem.title}
+                                </Typography>
+                            </div>
+
+                            {/* Image */}
+                            {selectedItem.images && selectedItem.images.length > 0 && (
+                                <div className="flex justify-center">
+                                    <img
+                                        src={selectedItem.images[0]}
+                                        alt={selectedItem.title}
+                                        className="max-w-full h-100 object-cover rounded-lg border border-gray-200"
+                                    />
+                                </div>
+                            )}
+
+                            {/* Description */}
+                            {selectedItem.description && (
+                                <div>
+                                    <Typography variant="subtitle2" className="font-medium text-gray-700 mb-1">
+                                        Description:
+                                    </Typography>
+                                    <Typography variant="body2" className="text-gray-600">
+                                        {selectedItem.description}
+                                    </Typography>
+                                </div>
+                            )}
+
+                            {/* Dates */}
+                            <div>
+                                <Typography variant="subtitle2" className="font-medium text-gray-700 mb-1">
+                                    Date:
+                                </Typography>
+                                <Typography variant="body2" className="text-gray-600">
+                                    {new Date(selectedItem.startDate).toLocaleDateString()}
+                                    {selectedItem.endDate && selectedItem.endDate !== selectedItem.startDate &&
+                                        ` - ${new Date(selectedItem.endDate).toLocaleDateString()}`
+                                    }
+                                </Typography>
+                            </div>
+
+                            {/* Tags */}
+                            {selectedItem.tags && selectedItem.tags.length > 0 && (
+                                <div>
+                                    <Typography variant="subtitle2" className="font-medium text-gray-700 mb-2">
+                                        Tags:
+                                    </Typography>
+                                    <div className="flex flex-wrap gap-1">
+                                        {selectedItem.tags.map((tag, index) => (
+                                            <span
+                                                key={index}
+                                                className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full"
+                                            >
+                                                {tag}
+                                            </span>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Impact */}
+                            {selectedItem.impact && (
+                                <div>
+                                    <Typography variant="subtitle2" className="font-medium text-gray-700 mb-1">
+                                        Impact:
+                                    </Typography>
+                                    <Typography variant="body2" className="text-gray-600">
+                                        {selectedItem.impact}
+                                    </Typography>
+                                </div>
+                            )}
+                        </div>
+                    ) : (
+                        <div className="text-center text-gray-500 mt-8">
+                            <Typography variant="body1">
+                                Click on a timeline item to see its details here.
+                            </Typography>
+                        </div>
+                    )}
+                </div>
+            </div>
         </>
     )
 }
