@@ -9,6 +9,8 @@ import { DataSet } from "vis-data";
 import type { DataGroup, DataItem } from "vis-timeline";
 import { Timeline } from "vis-timeline/standalone";
 import { createRoot, type Root } from "react-dom/client";
+import { getTimelineColor, defaultTimelineColor } from '../utils/timelineColors';
+
 import "vis-timeline/styles/vis-timeline-graph2d.min.css";
 
 interface ITimelineWithItems {
@@ -27,6 +29,8 @@ function LifeTimeline() {
     const itemsDSRef = useRef<DataSet<VisTimelineItem> | null>(null);
     const groupsDSRef = useRef<DataSet<DataGroup> | null>(null);
     const rootsMapRef = useRef<Map<Element, Root>>(new Map());
+    const isItemImageVisible = true
+
 
     const navigate = useNavigate()
 
@@ -55,13 +59,15 @@ function LifeTimeline() {
                 return {
                     ...item,
                     id: item._id, // Map MongoDB _id to vis-timeline id
-                    content: `<div class="test"> ${item.title} </div>`,
+                    // content: `<div class="test"> ${item.title} </div>`,
+                    content: `<div>${item.title}</div>${isItemImageVisible && item.images && item.images.length > 0 ? `<img src="${item.images[0]}" style="width:32px; height:32px; border-radius: 4px; margin-top: 4px;">` : ''}`,
+
                     start: startDate,
                     end: endDate,
                     group: timelineIndex + 1, // Each timeline gets its own group
                     // className: `timeline-group-${timelineIndex + 1}`, // Add custom class
-                    style: `--item-color: ${timelinesWithItems[timelineIndex].timelineColor}`, // Add inline CSS variable
-                    // style: `--item-color: pink}`, // Add inline CSS variable
+                    // style: `--item-color: ${timelinesWithItems[timelineIndex].timelineColor}`, // Add inline CSS variable
+                    style: `--item-color: #e7e4d7; border: 1px solid black`, // Add inline CSS variable
 
                 };
             })
@@ -80,7 +86,8 @@ function LifeTimeline() {
                 // Set CSS variable
                 masterTimelineContainerRef.current.style.setProperty(
                     `--timeline-${groupId}-color`,
-                    " rgba(255, 192, 203, 0.5)"
+                    getTimelineColor(index, {groupId})
+                    // " rgba(255, 192, 203, 0.5)"
                 );
 
                 // Check if style element exists, if not create it
@@ -95,13 +102,13 @@ function LifeTimeline() {
                 const cssRules = [
 
                     // Rule for group labels background
-                    `.vis-label.vis-group-level-0:nth-child(1) { 
+                    `.vis-label.vis-group-level-0:nth-child(${groupId}) { 
                         background-color: var(--timeline-${groupId}-color,  rgba(255, 192, 203, 0.5)) !important;
                         border-radius: 4px !important;
                         padding: 4px 8px !important;
                     }`,
                     // Alternative selector in case the data-group attribute doesn't work
-                    `.vis-group:nth-child(1) { 
+                    `.vis-foreground .vis-group:nth-child(${groupId}) { 
                         background-color: var(--timeline-${groupId}-color,  rgba(255, 192, 203, 0.5)) !important;
                         color: white !important;
                         border-radius: 4px !important;
