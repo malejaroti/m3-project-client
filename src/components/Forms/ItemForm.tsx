@@ -18,13 +18,13 @@ import React, { useContext, useState } from 'react';
 import type {
   ITimelineItem,
   TimelineItemCreateDTO,
-} from '../pages/TimelineItemsPage';
-import { AuthContext } from '../context/auth.context';
-import ImageUploader from './ImageUploader';
-import api from '../services/config.services';
+} from '../../pages/TimelineItemsPage';
+import { AuthContext } from '../../context/auth.context';
+import ImageUploader from '../ImageUploader';
+import api from '../../services/config.services';
 import { useNavigate } from 'react-router';
 import dayjs, { Dayjs } from 'dayjs';
-import { responsiveStyles } from '../shared-theme/themePrimitives';
+import { responsiveStyles } from '../../shared-theme/themePrimitives';
 
 export type FormType = 'edit' | 'create' | null; //union
 

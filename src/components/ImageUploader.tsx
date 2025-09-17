@@ -69,6 +69,7 @@ export default function ImageUploader({
 
   const resetFileInput = () => {
     setFile(null);
+    setIsFileSelected(false)
     onFileSelect?.(null);
     if (inputRef.current) inputRef.current.value = ''; // allow re-selecting the same file
   };
