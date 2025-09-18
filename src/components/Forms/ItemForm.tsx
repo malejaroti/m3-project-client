@@ -339,7 +339,7 @@ export default function ItemForm(props: ItemFormProps) {
 
           {/* Image uploader */}
           <FormGrid size={{ xs: 12 }}>
-            <ImageUploader onFileSelect={setFile} itemImage={props.item?.images[0]} />
+            <ImageUploader onFileSelect={setFile} imageTimelineItem={props.item?.images[0]} />
           </FormGrid>
         </Grid>
 

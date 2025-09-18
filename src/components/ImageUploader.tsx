@@ -1,5 +1,5 @@
 // ImageUploader.tsx
-import { useEffect, useId, useMemo, useRef, useState } from 'react';
+import { useEffect, useId, useRef, useState } from 'react';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
@@ -14,17 +14,16 @@ type ImageUploaderProps = {
   onFileSelect?: (file: File | null) => void;
   maxSizeMB?: number; // default 5MB
   accepted?: string; // default "image/*"
-  itemImage?: string
+  imageTimelineItem?: string
   label?: string; // button text
-  //   formDataSetter: React.SetStateAction
 };
 
 export default function ImageUploader({
   onFileSelect,
   maxSizeMB = 5,
   accepted = 'image/*',
-  itemImage,
-  label = itemImage ? "Change Image" : 'Upload image',
+  imageTimelineItem,
+  label = imageTimelineItem ? "Change Image" : 'Upload image', // If card already has an image, then change button label
 }: ImageUploaderProps) {
   const inputId = useId();
   const inputRef = useRef<HTMLInputElement | null>(null);
@@ -32,39 +31,40 @@ export default function ImageUploader({
   const [error, setError] = useState<string | null>(null);
   const [isFileSelected, setIsFileSelected] = useState(false);
 
-  const previewUrl = useMemo(
-    () => (file ? URL.createObjectURL(file) : ''),
-    [file]
-  );
-
+  const previewUrl = file ? URL.createObjectURL(file): ""
   useEffect(() => {
+    console.log("Mounted Image Uploader component or updated previewURL", previewUrl)
     return () => {
+      console.log("Unmounted component", previewUrl)
       if (previewUrl) URL.revokeObjectURL(previewUrl);
     };
   }, [previewUrl]);
 
-  const handleSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const f = e.target.files?.[0];
-    console.log('file selected: ', f);
-    if (!f) return;
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
 
-    // Basic validation
-    if (!f.type.startsWith('image/')) {
+    const selectedFile = e.target.files?.[0];
+    console.log('file selected: ', selectedFile);
+    if (!selectedFile) return;
+
+    // File validations
+    // Check it is an image
+    if (!selectedFile.type.startsWith('image/')) {
       setError('The selected file is not an image.');
       resetFileInput();
       return;
     }
+    
     const maxBytes = maxSizeMB * 1024 * 1024;
-    if (f.size > maxBytes) {
+    if (selectedFile.size > maxBytes) {
       setError(`Image exceeds ${maxSizeMB}MB.`);
       resetFileInput();
       return;
     }
 
     setError(null);
-    setFile(f);
+    setFile(selectedFile);
     setIsFileSelected(true)
-    onFileSelect?.(f);
+    onFileSelect?.(selectedFile);
   };
 
   const resetFileInput = () => {
@@ -82,7 +82,7 @@ export default function ImageUploader({
           ref={inputRef}
           type="file"
           accept={accepted}
-          onChange={handleSelect}
+          onChange={handleFileSelect}
           style={{ display: 'none' }}
         />
         <label htmlFor={inputId}>
@@ -130,38 +130,20 @@ export default function ImageUploader({
               {(file.size / (1024 * 1024)).toFixed(2)} MB • {file.type}
             </Typography>
           </CardContent>
-          {/* <CardActions>
-            <Button size="small" onClick={() => inputRef.current?.click()}>
-              Replace
-            </Button>
-            <Button size="small" color="error" onClick={resetFileInput}>
-              Delete
-            </Button>
-          </CardActions> */}
         </Card>
       )}
 
-      {itemImage && (
+      {imageTimelineItem && (
         <Card variant="outlined" sx={{ maxHeight: 350, p: 2, display: "flex", flexDirection: "column", justifyContent: "center" }}>
           {
             isFileSelected && <Typography variant='h6' align='center' sx={{ mb: 2 }}>Previous Image</Typography>
           }
-
           <CardMedia
             component="img"
-            image={itemImage}
-            alt={itemImage}
+            image={imageTimelineItem}
+            alt={imageTimelineItem}
             sx={{ flex: 1, minHeight: 0, aspectRatio: '1 / 1', objectFit: 'contain' }}
           />
-          {/* <CardContent>
-            <Typography variant="subtitle1" fontWeight={600}>
-              {file.name}
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
-              {(file.size / (1024 * 1024)).toFixed(2)} MB • {file.type}
-            </Typography>
-          </CardContent> */}
-
         </Card>
       )}
     </Stack>
