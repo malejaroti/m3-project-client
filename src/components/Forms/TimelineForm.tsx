@@ -1,6 +1,7 @@
 import Typography from "@mui/material/Typography"
 import { FormContainer, FormGrid, FormHeader } from "./FormSubcomponents/FormStyledSubcomponents"
 import type { ITimeline, TimelineCreateDTO } from "../../pages/TimelinesPage"
+import FormControl from "@mui/material/FormControl"
 import FormLabel from "@mui/material/FormLabel"
 import OutlinedInput from "@mui/material/OutlinedInput"
 import Grid from "@mui/material/Grid"
@@ -11,6 +12,11 @@ import { useContext, useState } from "react"
 import { AuthContext } from "../../context/auth.context"
 import api from "../../services/config.services"
 import { useNavigate } from "react-router"
+import Alert from '@mui/material/Alert';
+import FormHelperText from "@mui/material/FormHelperText"
+import Input from "@mui/material/Input"
+import InputLabel from "@mui/material/InputLabel"
+import TextField from "@mui/material/TextField"
 
 type TimelineFormProps =
     | {
@@ -28,7 +34,7 @@ type TimelineFormProps =
         onRefresh: () => void
     }
 
-    function TimelineForm(props: TimelineFormProps) {
+function TimelineForm(props: TimelineFormProps) {
     const authContext = useContext(AuthContext);
     if (!authContext) {
         throw new Error('Timeline creation must be done within an AuthWrapper');
@@ -50,6 +56,8 @@ type TimelineFormProps =
             ? { ...newTimelineData }
             : { ...props.timeline }
     );
+    const [errorMessageServer, setErrorMessageServer] = useState<string>("");
+    const [helperTextTitleInput, setHelperTextTitleInput] = useState<string | null>(null);
     const navigate = useNavigate();
 
     const handleFormDataChange = (
@@ -82,20 +90,32 @@ type TimelineFormProps =
     };
     const handleSubmit = async (event: React.FormEvent) => {
         event.preventDefault();
+
+        if(formData.title === ""){
+            setHelperTextTitleInput("Timeline name is required")
+            return
+        }
         const newTimeline = {
             ...formData,
         };
         console.log('new timeline: ', newTimeline);
-
+        
         try {
             const response = await api.post(`/timelines`, newTimeline);
             console.log('Res POST new timeline: ', response);
 
             // Call the success callbacks
-            props.onRefresh(); // Refresh the timelines
+            props.onRefresh(); // Refresh the timelines to show the new timeline
             props.onSuccess(); // Close the drawer
-        } catch (error) {
-            navigate('/error');
+        } catch (error: any) {
+            if (error.response?.status === 400) {
+                console.log('Error', error);
+                console.log('Server says: Bad request:', error.response.data.errorMessage);
+                setErrorMessageServer(error.response.data.errorMessage)
+                // Handle validation error - could show user-friendly message
+            } else {
+                console.log('Unexpected error:', error);
+            }
         }
     };
 
@@ -107,53 +127,56 @@ type TimelineFormProps =
                 </Typography>
             </FormHeader>
             <FormContainer>
-                <Grid container spacing={3} className="">
-                    <FormGrid size={{ xs: 12, md: 6 }}>
-                        <FormLabel htmlFor="first-name" required sx={responsiveStyles.formLabel}>
-                            Timeline title
-                        </FormLabel>
-                        <OutlinedInput
-                            id="title"
-                            name="title"
-                            type="name"
-                            placeholder="Timeline title"
-                            autoComplete="off"
-                            required
-                            size="small"
-                            sx={responsiveStyles.formInput}
-                            value={formData.title}
-                            onChange={handleFormDataChange}
-                        />
-                    </FormGrid>
+                <FormControl fullWidth error={helperTextTitleInput !== null}>
+                    <FormLabel htmlFor="title" required >
+                        Timeline name
+                    </FormLabel>
+                    <OutlinedInput
+                        id="title"
+                        name="title"
+                        type="text"
+                        placeholder="e.g., Books, Vacations, Career"
+                        autoFocus={props.formType==="create"}
+                        autoComplete="off"
+                        required
+                        size="small"
+                        sx={responsiveStyles.formInput}
+                        value={formData.title}
+                        onChange={handleFormDataChange}
+                        aria-describedby="timeline-name-helper-text"
+                    />
+                    <FormHelperText id="timeline-name-helper-text">{helperTextTitleInput !== null ? helperTextTitleInput: "Name must be unique across your timelines" }</FormHelperText>
+                </FormControl>
+                <FormControl fullWidth >
+                    <FormLabel htmlFor="description">
+                        Description
+                    </FormLabel>
+                    <OutlinedInput
+                        id="description"
+                        name="description"
+                        type="description"
+                        placeholder="What is this timeline about?"
+                        size="small" //makes the placeholder look closer to the top border of the input
+                        multiline
+                        rows={4}
+                        sx={responsiveStyles.formInput}
+                        value={formData.description}
+                        onChange={handleFormDataChange}
+                        // error={true}
+                    />
+                </FormControl>
+                { errorMessageServer !== "" 
+                    ? <Alert severity="error"> {errorMessageServer} </Alert>
+                    : null
+                } 
 
-
-                    <FormGrid size={{ xs: 12 }}>
-                        <FormLabel htmlFor="description" required sx={responsiveStyles.formLabel}>
-                            Description
-                        </FormLabel>
-                        <OutlinedInput
-                            id="description"
-                            name="description"
-                            type="description"
-                            placeholder=" What is this timeline about?"
-                            autoComplete="off"
-                            required
-                            size="small"
-                            multiline
-                            sx={responsiveStyles.formInput}
-                            value={formData.description}
-                            onChange={handleFormDataChange}
-                        />
-                    </FormGrid>
-                </Grid>
                 <Box
-                    component="form"
+                    // component="form"
                     sx={{
                         display: 'flex',
                         flexDirection: 'row',
                         alignItems: 'center',
                         justifyContent: 'space-evenly',
-                        // marginTop: { xs: 2, sm: 5, md: 10 },
                     }}
                     className=''
                 >
@@ -172,9 +195,8 @@ type TimelineFormProps =
                         size="medium"
                         sx={responsiveStyles.formInput}
                         onClick={props.formType === "create" ? handleSubmit : handleTimelineUpdate}
-                    // loading={isUploading}
                     >
-                        {props.formType === 'create' ? 'Create item' : 'Save changes'}
+                        {props.formType === 'create' ? 'Create Timeline' : 'Save changes'}
                     </Button>
                 </Box>
             </FormContainer>
