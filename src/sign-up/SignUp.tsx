@@ -1,4 +1,3 @@
-import * as React from 'react';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Checkbox from '@mui/material/Checkbox';
@@ -22,6 +21,14 @@ import {
 } from './components/CustomIcons';
 import api from '../services/config.services';
 import { useNavigate } from 'react-router';
+import { useEffect, useState, type ChangeEvent, type FormEvent } from 'react';
+import OutlinedInput from '@mui/material/OutlinedInput';
+import FormHelperText from '@mui/material/FormHelperText';
+import InputAdornment from '@mui/material/InputAdornment';
+import IconButton from '@mui/material/IconButton';
+import Visibility from '@mui/icons-material/Visibility';
+import VisibilityOff from '@mui/icons-material/VisibilityOff';
+import Alert from '@mui/material/Alert';
 
 const Card = styled(MuiCard)(({ theme }) => ({
   display: 'flex',
@@ -66,44 +73,61 @@ const SignUpContainer = styled(Stack)(({ theme }) => ({
 }));
 
 export default function SignUp(props: { disableCustomTheme?: boolean }) {
-  const [emailError, setEmailError] = React.useState(false);
-  const [emailErrorMessage, setEmailErrorMessage] = React.useState('');
-  const [passwordError, setPasswordError] = React.useState(false);
-  const [passwordErrorMessage, setPasswordErrorMessage] = React.useState('');
-  const [nameError, setNameError] = React.useState(false);
-  const [nameErrorMessage, setNameErrorMessage] = React.useState('');
-  const [formData, setFormData] = React.useState({
+  const [emailError, setEmailError] = useState(false);
+  const [emailErrorMessage, setEmailErrorMessage] = useState('');
+  const [passwordError, setPasswordError] = useState(false);
+  const [passwordErrorMessage, setPasswordErrorMessage] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [nameError, setNameError] = useState(false);
+  const [nameErrorMessage, setNameErrorMessage] = useState('');
+  const [serverErrorMessage, setServerErrorMessage] = useState('');
+  const [formData, setFormData] = useState({
     name: '',
     email: '',
     password: '',
     username: '',
   });
   const navigate = useNavigate();
+  
+  const passwordServerValidationRules = "Password must be at least 8 characters, contain at least one uppercase letter, one lowercase letter, one digit, and one special character"
 
+  const handleClickShowPassword = () => setShowPassword((show) => !show);
+  
+  const validatePassword = (password : string ) => {
+    // Use rules and regex from server to validate password in form
+    const passwordServerRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
+    if (!password || !passwordServerRegex.test(password)) {
+      setPasswordError(true);
+      setPasswordErrorMessage(passwordServerValidationRules);
+      return false
+    } else {
+      setPasswordError(false);
+      setPasswordErrorMessage('');
+      return true
+    }
+  }
+
+  const validateEmail = (email : string ) => {
+    if (!email || !/\S+@\S+\.\S+/.test(email)) {
+      setEmailError(true);
+      setEmailErrorMessage('Please enter a valid email address.');
+      return false;
+    } else {
+      setEmailError(false);
+      setEmailErrorMessage('');
+      return true
+    }
+  }
+  
   const validateInputs = () => {
     const email = document.getElementById('email') as HTMLInputElement;
     const password = document.getElementById('password') as HTMLInputElement;
     const name = document.getElementById('name') as HTMLInputElement;
-
     let isValid = true;
 
-    if (!email.value || !/\S+@\S+\.\S+/.test(email.value)) {
-      setEmailError(true);
-      setEmailErrorMessage('Please enter a valid email address.');
-      isValid = false;
-    } else {
-      setEmailError(false);
-      setEmailErrorMessage('');
-    }
-
-    if (!password.value || password.value.length < 6) {
-      setPasswordError(true);
-      setPasswordErrorMessage('Password must be at least 6 characters long.');
-      isValid = false;
-    } else {
-      setPasswordError(false);
-      setPasswordErrorMessage('');
-    }
+    
+    isValid = validateEmail(email.value) && isValid
+    isValid = validatePassword(password.value) && isValid
 
     if (!name.value || name.value.length < 1) {
       setNameError(true);
@@ -116,20 +140,22 @@ export default function SignUp(props: { disableCustomTheme?: boolean }) {
 
     return isValid;
   };
-  const handleOnChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+
+  const handleOnChange = (event: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.currentTarget;
     setFormData((prev) => ({
       ...prev,
       [name]: value,
     }));
+    if (name === 'email') validateEmail(value);
+    if (name === 'password') validatePassword(value);
   };
 
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (nameError || emailError || passwordError) {
-      event.preventDefault();
-      return;
-    }
+
+    if (!validateInputs()) return; //todo: Is this a good idea? preventing the request send if validation fails, but it might be incorrect if server updates validation rules and they are not longer in sync with the frontend.
+
     const data = new FormData(event.currentTarget);
     console.log({
       name: data.get('name'),
@@ -146,17 +172,27 @@ export default function SignUp(props: { disableCustomTheme?: boolean }) {
     };
 
     try {
+      // setServerErrorMessage('')
       const response = await api.post('/auth/signup', newUser);
       console.log(response);
       navigate('/sign-in');
-    } catch (error) {}
+
+    } catch (error: any) {
+        if (error.response && (error.response.status >= 400 || error.response.status <= 500 ) ) {
+              console.log('4** error:',error.response.data.errorMessage)
+              setServerErrorMessage(error.response.data.errorMessage)
+        } else {
+          console.log(error?.response)
+          navigate("/error")
+        }
+    }
   };
 
   return (
     <AppTheme {...props}>
       <CssBaseline enableColorScheme />
       <ColorModeSelect sx={{ position: 'fixed', top: '1rem', right: '1rem' }} />
-      <SignUpContainer direction="column" justifyContent="space-between">
+      <SignUpContainer direction="column" justifyContent="space-between" className='border'>
         <Card variant="outlined">
           <SitemarkIcon />
           <Typography
@@ -179,7 +215,7 @@ export default function SignUp(props: { disableCustomTheme?: boolean }) {
                 required
                 fullWidth
                 id="name"
-                placeholder="Jon Snow"
+                placeholder="Your name"
                 error={nameError}
                 helperText={nameErrorMessage}
                 color={nameError ? 'error' : 'primary'}
@@ -199,38 +235,54 @@ export default function SignUp(props: { disableCustomTheme?: boolean }) {
                 variant="outlined"
                 error={emailError}
                 helperText={emailErrorMessage}
-                color={passwordError ? 'error' : 'primary'}
+                color={emailError ? 'error' : 'primary'}
                 value={formData.email}
                 onChange={handleOnChange}
               />
             </FormControl>
-            <FormControl>
+            <FormControl error={passwordError}>
               <FormLabel htmlFor="password">Password</FormLabel>
-              <TextField
+              <OutlinedInput
                 required
                 fullWidth
                 name="password"
                 placeholder="••••••"
-                type="password"
+                type={showPassword ? 'text' : 'password'}
                 id="password"
-                autoComplete="new-password"
-                variant="outlined"
-                error={passwordError}
-                helperText={passwordErrorMessage}
+                // autoComplete="new-password"
+                // variant="outlined"
+                // error={passwordError}
+                // helperText={passwordValidationRules}
                 color={passwordError ? 'error' : 'primary'}
                 value={formData.password}
                 onChange={handleOnChange}
+                endAdornment={
+                  <InputAdornment position='end'>
+                      <IconButton
+                        aria-label={ showPassword ? 'hide the password' : 'display the password'}
+                        onClick={handleClickShowPassword}
+                        edge="end"
+                      >
+                        {showPassword ? <VisibilityOff /> : <Visibility />}
+                      </IconButton>
+                  </InputAdornment>
+                }
+                aria-describedby='password-helper-text'
               />
+              <FormHelperText id={"password-helper-text"}> {passwordErrorMessage !== ''? passwordErrorMessage : passwordServerValidationRules } </FormHelperText>
             </FormControl>
             <Button
               type="submit"
               fullWidth
               variant="contained"
-              onClick={validateInputs}
             >
               Sign up
             </Button>
           </Box>
+            { serverErrorMessage !== '' 
+                ? <Alert severity="error"> {serverErrorMessage}  </Alert>
+                : null
+            } 
           <Divider>
             <Typography sx={{ color: 'text.secondary' }}>or</Typography>
           </Divider>
