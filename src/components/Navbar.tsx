@@ -71,7 +71,7 @@ function Navbar() {
 
   const getUserData = async () => {
       try {
-      const response = await api.get('/user');
+      const response = await api.get('/users/logged-user');
       console.log("user data", response)
       setUserData(response.data);
       } catch (error) {
