@@ -56,7 +56,7 @@ function App() {
             </main>
           </BorderBox> */}
           {/* <Footer/> */}
-          <footer className="w-full h-[60px] bb-black"></footer>
+          {/* <footer className="w-full h-[60px] bb-black"></footer> */}
         </div>
         {/* Main page */}
         {/* Footer */}

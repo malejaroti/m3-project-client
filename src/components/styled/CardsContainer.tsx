@@ -9,6 +9,7 @@ export const CardsContainer = styled(Box)(() => ({
     gap: "50px",
     marginTop: "40px", // mt-10 = 2.5rem = 40px
     flexDirection: "row",
+    width: "100%"
 
     // "@media (max-width: 1024px)": {
     //     flexDirection: "column",

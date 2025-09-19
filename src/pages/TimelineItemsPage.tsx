@@ -176,7 +176,7 @@ function TimelineItemsPage() {
 
           </Grid> */}
 
-          <div className="flex flex-wrap justify-center gap-20 mt-10 lg:flex-row sm:flex-col">
+          <div className="flex flex-wrap justify-left gap-20 mt-10 lg:flex-row sm:flex-col">
             {timelineItems.map((timelineItem) => (
               <Card sx={{ maxWidth: 300, display: 'flex', flexDirection: 'column' }} key={timelineItem._id} className='p-5'>
                 {/* <CardActionArea> */}
