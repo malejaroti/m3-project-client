@@ -1,6 +1,8 @@
 import api from '../services/config.services';
 import { createContext, useEffect, useState } from 'react';
 import { type ReactNode } from 'react';
+import { MoonLoader } from "react-spinners";
+
 
 interface AuthContextType {
   isLoggedIn: boolean;
@@ -53,7 +55,46 @@ function AuthWrapper(props: AuthWrapperProps) {
   };
 
   if (isAuthenticating) {
-    return <h3>Authenticating User...</h3>;
+    const containerStyle: React.CSSProperties = {
+      minHeight: '100svh',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: '2rem',
+    };
+
+    const contentStyle: React.CSSProperties = {
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      gap: '1rem',
+      textAlign: 'center',
+      maxWidth: '44rem',
+      margin: '0 auto',
+    };
+
+    const messageStyle: React.CSSProperties = {
+      lineHeight: 1.5,
+      fontSize: '1.5rem',
+      opacity: 0.9,
+    };
+
+    return (
+      <main style={containerStyle}>
+        <section style={contentStyle}>
+          <MoonLoader
+            color={'#79a4aa'}
+            loading={isAuthenticating}
+            size={80}
+            aria-label="Loading Spinner"
+            data-testid="loader"
+          />
+          <p style={messageStyle} aria-live="polite">
+            Authenticating user… This project uses a free server on Render, so it may take a few seconds to start up (especially on the first load). Thanks for your patience.
+          </p>
+        </section>
+      </main>
+    )
   }
 
   return (
