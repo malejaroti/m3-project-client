@@ -9,19 +9,7 @@ import Box from "@mui/material/Box"
 import IconButton from "@mui/material/IconButton"
 import Edit from '@mui/icons-material/Edit';
 import Delete from '@mui/icons-material/Delete';
-
-type TimelineCardProps =
-  | {
-    timelineOnwer: "loggedUser"
-    timeline: ITimeline
-    onClickEditButton: () => void
-    handleClickOnDeleteButton: () => void
-  }
-  | {
-    timelineOnwer: "collaborator"
-    timeline: ITimeline
-    onClickEditButton: () => void
-  }
+import defaultAvatar from "../assets/default-avatar.jpg"
 
 
 const responsiveFontSize = {
@@ -35,7 +23,28 @@ const responsiveFontSize = {
   },
 }
 
+type TimelineCardProps =
+  | {
+    timelineOwner: "loggedUser"
+    timeline: ITimeline
+    onClickEditButton: () => void
+    handleClickOnDeleteButton: () => void
+  }
+  | {
+    timelineOwner: "collaborator"
+    timeline: ITimeline
+    onClickEditButton: () => void
+  }
+
 function TimelineCard(props: TimelineCardProps) {
+  if(props.timelineOwner === "collaborator"){
+    console.log("props.timeline: ", props.timeline)
+    console.log("props.timeline.owner: ", props.timeline.owner)
+  }
+  // if(props.timelineOwner === "loggedUser"){
+  //   console.log("props.timeline.collaborators: ", props.timeline.collaborators)
+  // }
+
   return (
     <>
       <Card sx={{ width: 300 }} key={props.timeline._id}>
@@ -57,6 +66,7 @@ function TimelineCard(props: TimelineCardProps) {
         } */}
           <CardContent>
             <div className="flex items-center gap-[8px] mb-[10px]">
+              {/* Timeline icon */}
               {props.timeline.icon && props.timeline.icon !== ""
                 ? <img src={props.timeline.icon} alt="timeline icon" className="size-[50px]" />
                 : null
@@ -64,58 +74,104 @@ function TimelineCard(props: TimelineCardProps) {
               <Typography variant="h4" className="self-center">
                 {props.timeline.title}
               </Typography>
-
             </div>
+
             <Typography variant="body1"
               sx={responsiveFontSize}
             >
               {props.timeline.description}
             </Typography>
 
-            {/* Icon buttons section  */}
+
             <Box sx={{
               display: 'flex',
-              marginTop: 'auto',
+              // flexGrow: 1,
+              height: '100%',
+              marginTop: '25px',
               alignSelf: 'flex-end',
-              justifyContent: 'flex-end',
-              // border:1
+              justifyContent: 'space-between',
+              // borderTop: '2px dashed gray',
+              width: '100%',
+              // background: 'red'
             }}
-              className="">
-              {props.timelineOnwer === "loggedUser" &&
-                <IconButton
-                  aria-label="Edit item"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    props.onClickEditButton();
-                  }}
-                  size="small"
-                  sx={{
-                    alignSelf: 'flex-end',
-                    justifySelf: 'flex-end',
-                  }}
-                >
-                  <Edit fontSize="small" />
-                </IconButton>
+              className=""
+            >
+              {/* Collaborators box */}
+              {
+                props.timelineOwner === "loggedUser" && props.timeline.collaborators && props.timeline.collaborators.length > 0 &&
+                <div className="collaborators-box flex flex-col gap-3">
+                  <Typography sx={{fontSize:{xs:'10px', md:'11px', lg:'13px' }, fontStyle:'italic'}}>
+                    Collaborators:
+                  </Typography>
+                  <div className="flex gap-3 ">
+                  {
+                    props.timeline.collaborators?.map((collaborator) => (
+                      <div key={collaborator.name} className="flex flex-col">
+                        <Typography sx={{ fontSize: { xs: '10px', md: '11px', lg: '13px' } }}>
+                          {collaborator.name && (collaborator.name).split(" ", 1)}
+                        </Typography>
+                        <img src={collaborator?.profilePicture !== ""? collaborator.profilePicture : defaultAvatar } alt="collaborator picture" className="w-[40px] border-1 border-slate-500 aspect-square rounded-full object-cover" />
+                      </div>
+                    ))
+                  }
+
+                  </div>
+                </div>
               }
 
-              {"handleClickOnDeleteButton" in props &&
-                <IconButton
-                  aria-label="Delete item"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    props.handleClickOnDeleteButton();
-                  }}
-                  size="small"
-                  sx={{
-                    alignSelf: 'flex-end',
-                    justifySelf: 'flex-end',
-                  }}
-                >
-                  <Delete fontSize="small" />
-                </IconButton>
+              {/* Owner box */}
+              {
+                props.timelineOwner === "collaborator" &&
+                <div className="">
+                  <Typography sx={{fontSize:{xs:'10px', md:'11px', lg:'13px' }, fontStyle:'italic'}}>
+                    Owned by:
+                  </Typography>
+                  <Typography sx={{ fontSize: { xs: '10px', md: '11px', lg: '13px' } }}>
+                    {(props.timeline.owner?.name ?? 'Unknown owner').trim().split(" ", 1)}
+                  </Typography>
+                  <img src={props.timeline.owner?.profilePicture? props.timeline.owner?.profilePicture :  defaultAvatar} alt="owner picture" className="w-[40px] border-1 border-slate-500 aspect-square rounded-full object-cover" />
+                  {/* <img src={props.timeline.owner?.profilePicture} alt="owner picture" className="w-[40px] border-1 border-slate-500 aspect-square rounded-full object-cover" /> */}
+                </div>
               }
+
+              {/* Box with icons */}
+              <Box sx={{ mt: 'auto', ml: 'auto' }}>
+                {props.timelineOwner === "loggedUser" &&
+                  <IconButton
+                    aria-label="Edit item"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      props.onClickEditButton();
+                    }}
+                    size="small"
+                    sx={{
+                      alignSelf: 'flex-end',
+                      justifySelf: 'flex-end',
+                    }}
+                  >
+                    <Edit fontSize="small" />
+                  </IconButton>
+                }
+
+                {"handleClickOnDeleteButton" in props &&
+                  <IconButton
+                    aria-label="Delete item"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      props.handleClickOnDeleteButton();
+                    }}
+                    size="small"
+                    sx={{
+                      alignSelf: 'flex-end',
+                      justifySelf: 'flex-end',
+                    }}
+                  >
+                    <Delete fontSize="small" />
+                  </IconButton>
+                }
+              </Box>
 
             </Box>
           </CardContent>
