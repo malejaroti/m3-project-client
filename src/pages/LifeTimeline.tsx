@@ -10,8 +10,11 @@ import type { DataGroup, DataItem } from "vis-timeline";
 import { Timeline } from "vis-timeline/standalone";
 import { createRoot, type Root } from "react-dom/client";
 import { getTimelineColor, defaultTimelineColor } from '../utils/timelineColors';
+import Visibility from '@mui/icons-material/Visibility';
+import VisibilityOff from '@mui/icons-material/VisibilityOff';
 
 import "vis-timeline/styles/vis-timeline-graph2d.min.css";
+import Button from "@mui/material/Button";
 
 interface ITimelineWithItems {
     timelineTitle: string,
@@ -25,12 +28,12 @@ function LifeTimeline() {
     const [timelinesWithItems, setTimelinesWithItems] = useState<ITimelineWithItems[]>();
     const [timelines, setTimelines] = useState<ITimeline[]>([]);
     const [selectedItem, setSelectedItem] = useState<ITimelineItem | null>(null);
+    const [imageItemsVisibility, setImageItemsVisibility] = useState(false);
     const masterTimelineContainerRef = useRef<HTMLDivElement | null>(null);
     const timelineRef = useRef<Timeline | null>(null);
     const itemsDSRef = useRef<DataSet<VisTimelineItem> | null>(null);
     const groupsDSRef = useRef<DataSet<DataGroup> | null>(null);
     const rootsMapRef = useRef<Map<Element, Root>>(new Map());
-    const isItemImageVisible = false
 
 
     const navigate = useNavigate()
@@ -61,7 +64,7 @@ function LifeTimeline() {
                     ...item,
                     id: item._id, // Map MongoDB _id to vis-timeline id
                     // content: `<div class="test"> ${item.title} </div>`,
-                    content: `<div>${item.title}</div>${isItemImageVisible && item.images && item.images.length > 0 ? `<img src="${item.images[0]}" style="width:32px; height:32px; border-radius: 4px; margin-top: 4px;">` : ''}`,
+                    content: `<div>${item.title}</div>${imageItemsVisibility && item.images && item.images.length > 0 ? `<img src="${item.images[0]}" style="width:32px; height:32px; border-radius: 4px; margin-top: 4px;">` : ''}`,
 
                     start: startDate,
                     end: endDate,
@@ -199,6 +202,25 @@ function LifeTimeline() {
         }
     }, [timelines])
 
+    // Update item content when toggling image visibility
+    useEffect(() => {
+        if (!itemsDSRef.current || !timelineRef.current || !timelinesWithItems) return;
+
+        const updates = timelinesWithItems.flatMap(tl =>
+            tl.items.map(item => ({
+                id: item._id,
+                content: `<div>${item.title}</div>${imageItemsVisibility && item.images && item.images.length > 0 ? `<img src="${item.images[0]}" style="width:32px; height:32px; border-radius:4px; margin-top:4px;">` : ''}`,
+            }))
+        );
+
+        try {
+            (itemsDSRef.current as any).update(updates);
+            timelineRef.current.redraw();
+        } catch (e) {
+            console.warn('Failed to update items content on toggle', e);
+        }
+    }, [imageItemsVisibility, timelinesWithItems]);
+
     const getTimelinesData = async () => {
         try {
             const response = await api.get("/timelines")
@@ -234,8 +256,33 @@ function LifeTimeline() {
     }
 
     return (
-        <>
-            <Typography variant="h3" className="mb-4">My Life Timeline</Typography>
+        <main>
+            <div className="flex gap-6 mb-8 items-center">
+                <Typography variant="h3" className="mb-4">My Life Timeline</Typography>
+                <Button
+                    variant="outlined"
+                    size='small'
+                    sx={{
+                        fontSize: { xs: "0.7rem", sm: "0.85rem", md: "0.8rem" },
+                        px: { xs: 1, sm: 2, md: 1 },
+                        py: { xs: 0.5, sm: 1, md: 0 },
+                        height: '2rem'
+                    }}
+                    onClick={() => setImageItemsVisibility(s => !s)}
+                // onClick={onClick}
+                >
+                    {imageItemsVisibility ? (
+                        <div className=" flex gap-2">
+                            <VisibilityOff /> Hide items images
+                        </div>
+                    ) : (
+                        <div className=" flex gap-2">
+                            <Visibility /> See items images
+                        </div>
+                    )}
+                </Button>
+            </div>
+
             <div className="flex gap-4 h-[calc(100vh-200px)]">
                 {/* Timeline Container */}
                 <div
@@ -335,7 +382,7 @@ function LifeTimeline() {
                     )}
                 </div>
             </div>
-        </>
+        </main>
     )
 }
 export default LifeTimeline

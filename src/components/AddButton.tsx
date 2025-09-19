@@ -22,7 +22,6 @@ function AddButton({ onClick, buttonLabel}: AddButtonProps) {
                     bgcolor: 'primary.dark',
                 },
             }}
-            // onClick={() => openDrawerCreate('right')}
             onClick={onClick}
         >
             {buttonLabel}
