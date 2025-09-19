@@ -1,22 +1,18 @@
 import Typography from "@mui/material/Typography"
-import { FormContainer, FormGrid, FormHeader } from "./FormSubcomponents/FormStyledSubcomponents"
-import type { ITimeline, TimelineCreateDTO } from "../../pages/TimelinesPage"
+import { FormContainer, FormHeader } from "./FormSubcomponents/FormStyledSubcomponents"
+import type { ITimeline, TimelineCreatePayload } from "../../pages/TimelinesPage"
 import FormControl from "@mui/material/FormControl"
 import FormLabel from "@mui/material/FormLabel"
 import OutlinedInput from "@mui/material/OutlinedInput"
-import Grid from "@mui/material/Grid"
 import Button from "@mui/material/Button"
 import Box from "@mui/material/Box"
 import { responsiveStyles } from "../../shared-theme/themePrimitives"
 import { useContext, useState } from "react"
 import { AuthContext } from "../../context/auth.context"
 import api from "../../services/config.services"
-import { useNavigate } from "react-router"
 import Alert from '@mui/material/Alert';
 import FormHelperText from "@mui/material/FormHelperText"
-import Input from "@mui/material/Input"
-import InputLabel from "@mui/material/InputLabel"
-import TextField from "@mui/material/TextField"
+// Removed unused MUI inputs
 
 type TimelineFormProps =
     | {
@@ -41,7 +37,7 @@ function TimelineForm(props: TimelineFormProps) {
     }
     const { loggedUserId } = authContext;
 
-    const newTimelineData: TimelineCreateDTO = {
+    const newTimelineData: TimelineCreatePayload = {
         owner: loggedUserId !== null ? loggedUserId : '',
         title: '',
         description: '',
@@ -51,14 +47,14 @@ function TimelineForm(props: TimelineFormProps) {
         color: "gray"
     };
 
-    const [formData, setFormData] = useState<TimelineCreateDTO>(
-        props.formType === "create"
-            ? { ...newTimelineData }
-            : { ...props.timeline }
+    // In create mode, formData matches TimelineCreatePayload (ids only)
+    // In edit mode, we keep the populated ITimeline in state but only edit common fields
+    const [formData, setFormData] = useState<TimelineCreatePayload | ITimeline>(
+        props.formType === "create" ? { ...newTimelineData } : { ...props.timeline }
     );
     const [errorMessageServer, setErrorMessageServer] = useState<string>("");
     const [helperTextTitleInput, setHelperTextTitleInput] = useState<string | null>(null);
-    const navigate = useNavigate();
+    // const navigate = useNavigate(); // navigation not used within this form currently
 
     const handleFormDataChange = (
         event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -72,8 +68,13 @@ function TimelineForm(props: TimelineFormProps) {
 
     const handleTimelineUpdate = async (event: React.FormEvent) => {
         event.preventDefault();
-        const updatedTimeline = {
-            ...formData,
+        // Build a minimal update object using fields editable in this form
+        const updatedTimeline: Partial<Pick<ITimeline, 'title' | 'description' | 'icon' | 'isPublic' | 'color'>> = {
+            title: (formData as ITimeline).title,
+            description: (formData as ITimeline).description,
+            icon: (formData as ITimeline).icon,
+            isPublic: (formData as ITimeline).isPublic,
+            color: (formData as ITimeline).color,
         };
         console.log('Updates for timeline: ', updatedTimeline);
 
@@ -84,22 +85,36 @@ function TimelineForm(props: TimelineFormProps) {
             // Call the success callbacks
             props.onRefresh(); // Refresh the timelines
             props.onSuccess(); // Close the drawer
-        } catch (error) {
-            navigate('/error');
+        } catch (error: any) {
+            if (error.response?.status === 400) {
+                console.log('Error', error);
+                console.log('Server says: Bad request:', error.response.data.errorMessage);
+                setErrorMessageServer(error.response.data.errorMessage)
+                // Handle validation error - could show user-friendly message
+            } else {
+                console.log('Unexpected error:', error);
+            }
         }
     };
     const handleSubmit = async (event: React.FormEvent) => {
         event.preventDefault();
 
-        if(formData.title === ""){
+        if (formData.title === "") {
             setHelperTextTitleInput("Timeline name is required")
             return
         }
-        const newTimeline = {
-            ...formData,
+        // POST expects ids (owner, collaborators)
+        const newTimeline: TimelineCreatePayload = {
+            owner: (formData as TimelineCreatePayload).owner,
+            title: (formData as TimelineCreatePayload).title,
+            description: (formData as TimelineCreatePayload).description,
+            icon: (formData as TimelineCreatePayload).icon,
+            collaborators: (formData as TimelineCreatePayload).collaborators ?? [],
+            isPublic: (formData as TimelineCreatePayload).isPublic,
+            color: (formData as TimelineCreatePayload).color,
         };
         console.log('new timeline: ', newTimeline);
-        
+
         try {
             const response = await api.post(`/timelines`, newTimeline);
             console.log('Res POST new timeline: ', response);
@@ -136,7 +151,7 @@ function TimelineForm(props: TimelineFormProps) {
                         name="title"
                         type="text"
                         placeholder="e.g., Books, Vacations, Career"
-                        autoFocus={props.formType==="create"}
+                        autoFocus={props.formType === "create"}
                         autoComplete="off"
                         required
                         size="small"
@@ -145,7 +160,7 @@ function TimelineForm(props: TimelineFormProps) {
                         onChange={handleFormDataChange}
                         aria-describedby="timeline-name-helper-text"
                     />
-                    <FormHelperText id="timeline-name-helper-text">{helperTextTitleInput !== null ? helperTextTitleInput: "Name must be unique across your timelines" }</FormHelperText>
+                    <FormHelperText id="timeline-name-helper-text">{helperTextTitleInput !== null ? helperTextTitleInput : "Name must be unique across your timelines"}</FormHelperText>
                 </FormControl>
                 <FormControl fullWidth >
                     <FormLabel htmlFor="description">
@@ -162,13 +177,13 @@ function TimelineForm(props: TimelineFormProps) {
                         sx={responsiveStyles.formInput}
                         value={formData.description}
                         onChange={handleFormDataChange}
-                        // error={true}
+                    // error={true}
                     />
                 </FormControl>
-                { errorMessageServer !== "" 
+                {errorMessageServer !== ""
                     ? <Alert severity="error"> {errorMessageServer} </Alert>
                     : null
-                } 
+                }
 
                 <Box
                     // component="form"
