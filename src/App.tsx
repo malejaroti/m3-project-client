@@ -12,6 +12,8 @@ import TimelineItemsPage from './pages/TimelineItemsPage.tsx';
 import ErrorPage from './pages/ErrorPage.tsx';
 import Home from './pages/Home.tsx';
 import LifeTimeline from './pages/LifeTimeline.tsx';
+import NotFoundPage from './pages/NotFoundPage.tsx';
+import UserProfilePage from './pages/UserProfilePage.tsx';
 
 // import Link from '@mui/material/Link'
 
@@ -37,14 +39,15 @@ function App() {
               <Route path="/timeline/:timelineId" element={<OnlyPrivate>{' '}<TimelineItemsPage />{' '} </OnlyPrivate>} />
               <Route path="/timeline/:timelineId" element={<OnlyPrivate>{' '}<TimelineItemsPage />{' '} </OnlyPrivate>} />
               <Route path="/lifetimeline" element={<OnlyPrivate> <LifeTimeline /> </OnlyPrivate>} />
+              <Route path="/user-profile" element={<OnlyPrivate> <UserProfilePage /> </OnlyPrivate>} />
               <Route path="/" element={<Home />} />
               <Route path="/sign-up" element={<SignUp />} />
               <Route path="/sign-in" element={<SignIn />} />
 
               <Route path="/error" element={<ErrorPage />} />
+              <Route path="*" element={<NotFoundPage />} />
               {/* <Route path="/about" element={<AboutPage />} /> */}
 
-              {/* <Route path="*" element={<NotFoundPage />} /> */}
             </Routes>
             {/* </div> */}
           </main>

@@ -6,7 +6,7 @@ export const CardsContainer = styled(Box)(() => ({
     display: "flex",
     flexWrap: "wrap",
     justifyContent: "left",
-    gap: "20px",
+    gap: "50px",
     marginTop: "40px", // mt-10 = 2.5rem = 40px
     flexDirection: "row",
 

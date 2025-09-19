@@ -1,38 +1,42 @@
 import { useCallback, useContext, useEffect, useState } from 'react';
 import api from '../services/config.services';
 import Typography from '@mui/material/Typography';
-import { Link, useNavigate } from 'react-router';
+import { useNavigate } from 'react-router';
 import TimelineCard from '../components/TimelineCard';
-import Button from '@mui/material/Button';
 import Drawer from '@mui/material/Drawer';
 import AddButton from '../components/AddButton';
-import type { DrawerPosition, DrawerState } from './TimelineItemsPage';
+import type { DrawerState } from './TimelineItemsPage';
 import TimelineForm from '../components/Forms/TimelineForm';
 import type { FormType } from '../components/Forms/ItemForm';
 import { AuthContext } from '../context/auth.context';
 import DeleteModal from '../components/DeleteModal';
 import { CardsContainer } from '../components/styled/CardsContainer'
-
+import type { IUser } from './UserProfilePage';
 export interface ITimeline {
   _id: string;
-  owner: string;
+  owner: IUser;
   title: string;
   icon?: string;
   description?: string;
   startDate?: string; // calculated in backend
   endDate?: string;   // calculated in backend
-  collaborators?: string[];
+  collaborators?: IUser[];
   isPublic: boolean;
   color?: string;
   createdAt: string; // ISO timestamp
   updatedAt: string; // ISO timestamp
 }
 
-// DTO for creating a new item (exclude server-managed fields)
-export type TimelineCreateDTO = Omit<
-  ITimeline,
-  '_id' | 'startDate' | 'endDtate' | 'startDate' | 'createdAt' | 'updatedAt'
->;
+// Payload for creating a new timeline (server expects ids, not populated objects)
+export type TimelineCreatePayload = {
+  owner: string;               // owner id
+  title: string;
+  icon?: string;
+  description?: string;
+  collaborators?: string[];    // collaborator ids
+  isPublic: boolean;
+  color?: string;
+};
 
 function TimelinesPage() {
   const authContext = useContext(AuthContext);
@@ -49,12 +53,15 @@ function TimelinesPage() {
     position: 'right',
     open: false,
   });
+  const [usersData, setUsersData] = useState<IUser[] | null>(null);
   const navigate = useNavigate()
-
-
+    
+    
   useEffect(() => {
     getUserTimelines();
     getCollaborationTimelines();
+    getUsersData();
+
   }, []);
 
   const getUserTimelines = async () => {
@@ -66,6 +73,7 @@ function TimelinesPage() {
       console.log(error);
     }
   };
+  
   const getCollaborationTimelines = async () => {
     try {
       const response = await api.get('/timelines/collaborations');
@@ -74,6 +82,16 @@ function TimelinesPage() {
     } catch (error) {
       console.log(error);
     }
+  };
+
+  const getUsersData = async () => {
+      try {
+      const response = await api.get('/users');
+      console.log("All users data", response)
+      setUsersData(response.data);
+      } catch (error) {
+      console.log(error);
+      }
   };
   const openDeleteModal = useCallback((timeline: ITimeline) => {
     setSelectedTimeline(timeline);
@@ -111,9 +129,9 @@ function TimelinesPage() {
   }
 
   return (
-    <main className='relative flex flex-col gap-8'>
+    <main className='relative flex flex-col gap-8 m-auto'>
       <section className="user-timelines">
-        <Typography variant="h4" component="h2">
+        <Typography variant="h3" component="h2">
           My timelines
         </Typography>
         <CardsContainer>
@@ -121,25 +139,29 @@ function TimelinesPage() {
             // {console.log(timeline)}
             <TimelineCard
               key={timeline._id}
-              timelineOnwer={timeline.owner === loggedUserId ? "loggedUser" : "collaborator"}
+              timelineOwner={timeline.owner._id === loggedUserId ? "loggedUser" : "collaborator"}
               timeline={timeline}
               onClickEditButton={() => openDrawerWithEditForm(timeline)}
               handleClickOnDeleteButton={() => openDeleteModal(timeline)}
+              allUsers={usersData ?? []}
             />
           ))}
         </CardsContainer>
       </section>
       <section className="collaboration-timelines">
-        <Typography variant="h4" component="h2">
+        <Typography variant="h3" component="h2">
           Collaboration timelines
         </Typography>
         <CardsContainer>
           {collaborationTimelines.map((timeline) => (
             <TimelineCard
               key={timeline._id}
-              timelineOnwer="collaborator"
+              timelineOwner="collaborator"
               timeline={timeline}
-              onClickEditButton={() => openDrawerWithEditForm(timeline)} />
+              onClickEditButton={() => openDrawerWithEditForm(timeline)} 
+              allUsers={usersData ?? []}
+
+            />
           ))}
         </CardsContainer>
       </section>

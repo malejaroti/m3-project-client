@@ -1,4 +1,3 @@
-import * as React from 'react';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Checkbox from '@mui/material/Checkbox';
@@ -10,100 +9,78 @@ import FormControl from '@mui/material/FormControl';
 import Link from '@mui/material/Link';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
-import Stack from '@mui/material/Stack';
-import MuiCard from '@mui/material/Card';
-import { styled } from '@mui/material/styles';
 import AppTheme from '../shared-theme/AppTheme';
 import ColorModeSelect from '../shared-theme/ColorModeSelect';
-import {
-  GoogleIcon,
-  FacebookIcon,
-  SitemarkIcon,
-} from './components/CustomIcons';
+import { GoogleIcon, FacebookIcon, SitemarkIcon } from './components/CustomIcons';
 import api from '../services/config.services';
 import { useNavigate } from 'react-router';
-
-const Card = styled(MuiCard)(({ theme }) => ({
-  display: 'flex',
-  flexDirection: 'column',
-  alignSelf: 'center',
-  width: '100%',
-  padding: theme.spacing(4),
-  gap: theme.spacing(2),
-  margin: 'auto',
-  boxShadow:
-    'hsla(220, 30%, 5%, 0.05) 0px 5px 15px 0px, hsla(220, 25%, 10%, 0.05) 0px 15px 35px -5px',
-  [theme.breakpoints.up('sm')]: {
-    width: '450px',
-  },
-  ...theme.applyStyles('dark', {
-    boxShadow:
-      'hsla(220, 30%, 5%, 0.5) 0px 5px 15px 0px, hsla(220, 25%, 10%, 0.08) 0px 15px 35px -5px',
-  }),
-}));
-
-const SignUpContainer = styled(Stack)(({ theme }) => ({
-  height: 'calc((1 - var(--template-frame-height, 0)) * 100dvh)',
-  minHeight: '100%',
-  padding: theme.spacing(2),
-  [theme.breakpoints.up('sm')]: {
-    padding: theme.spacing(4),
-  },
-  '&::before': {
-    content: '""',
-    display: 'block',
-    position: 'absolute',
-    zIndex: -1,
-    inset: 0,
-    backgroundImage:
-      'radial-gradient(ellipse at 50% 50%, hsl(210, 100%, 97%), hsl(0, 0%, 100%))',
-    backgroundRepeat: 'no-repeat',
-    ...theme.applyStyles('dark', {
-      backgroundImage:
-        'radial-gradient(at 50% 50%, hsla(210, 100%, 16%, 0.5), hsl(220, 30%, 5%))',
-    }),
-  },
-}));
+import { useState, type ChangeEvent, type FormEvent } from 'react';
+import OutlinedInput from '@mui/material/OutlinedInput';
+import FormHelperText from '@mui/material/FormHelperText';
+import InputAdornment from '@mui/material/InputAdornment';
+import IconButton from '@mui/material/IconButton';
+import Visibility from '@mui/icons-material/Visibility';
+import VisibilityOff from '@mui/icons-material/VisibilityOff';
+import Alert from '@mui/material/Alert';
+import { SignContainer, CardForSignContainer } from '../components/styled/Sytled_AuthForms';
 
 export default function SignUp(props: { disableCustomTheme?: boolean }) {
-  const [emailError, setEmailError] = React.useState(false);
-  const [emailErrorMessage, setEmailErrorMessage] = React.useState('');
-  const [passwordError, setPasswordError] = React.useState(false);
-  const [passwordErrorMessage, setPasswordErrorMessage] = React.useState('');
-  const [nameError, setNameError] = React.useState(false);
-  const [nameErrorMessage, setNameErrorMessage] = React.useState('');
-  const [formData, setFormData] = React.useState({
+  const [emailError, setEmailError] = useState(false);
+  const [emailErrorMessage, setEmailErrorMessage] = useState('');
+  const [passwordError, setPasswordError] = useState(false);
+  const [passwordErrorMessage, setPasswordErrorMessage] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [nameError, setNameError] = useState(false);
+  const [nameErrorMessage, setNameErrorMessage] = useState('');
+  const [serverErrorMessage, setServerErrorMessage] = useState('');
+  const [formData, setFormData] = useState({
     name: '',
     email: '',
     password: '',
     username: '',
+    profilePicture: ''
   });
   const navigate = useNavigate();
+
+  const passwordServerValidationRules = "Password must be at least 8 characters, contain at least one uppercase letter, one lowercase letter, one digit, and one special character"
+
+  const handleClickShowPassword = () => setShowPassword((show) => !show);
+
+  const validatePassword = (password: string) => {
+    // Use rules and regex from server to validate password in form
+    const passwordServerRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
+    if (!password || !passwordServerRegex.test(password)) {
+      setPasswordError(true);
+      setPasswordErrorMessage(passwordServerValidationRules);
+      return false
+    } else {
+      setPasswordError(false);
+      setPasswordErrorMessage('');
+      return true
+    }
+  }
+
+  const validateEmail = (email: string) => {
+    if (!email || !/\S+@\S+\.\S+/.test(email)) {
+      setEmailError(true);
+      setEmailErrorMessage('Please enter a valid email address.');
+      return false;
+    } else {
+      setEmailError(false);
+      setEmailErrorMessage('');
+      return true
+    }
+  }
 
   const validateInputs = () => {
     const email = document.getElementById('email') as HTMLInputElement;
     const password = document.getElementById('password') as HTMLInputElement;
     const name = document.getElementById('name') as HTMLInputElement;
-
     let isValid = true;
 
-    if (!email.value || !/\S+@\S+\.\S+/.test(email.value)) {
-      setEmailError(true);
-      setEmailErrorMessage('Please enter a valid email address.');
-      isValid = false;
-    } else {
-      setEmailError(false);
-      setEmailErrorMessage('');
-    }
 
-    if (!password.value || password.value.length < 6) {
-      setPasswordError(true);
-      setPasswordErrorMessage('Password must be at least 6 characters long.');
-      isValid = false;
-    } else {
-      setPasswordError(false);
-      setPasswordErrorMessage('');
-    }
+    isValid = validateEmail(email.value) && isValid
+    isValid = validatePassword(password.value) && isValid
 
     if (!name.value || name.value.length < 1) {
       setNameError(true);
@@ -116,49 +93,52 @@ export default function SignUp(props: { disableCustomTheme?: boolean }) {
 
     return isValid;
   };
-  const handleOnChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+
+  const handleOnChange = (event: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.currentTarget;
     setFormData((prev) => ({
       ...prev,
       [name]: value,
     }));
+    if (name === 'email') validateEmail(value);
+    if (name === 'password') validatePassword(value);
   };
 
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (nameError || emailError || passwordError) {
-      event.preventDefault();
-      return;
-    }
-    const data = new FormData(event.currentTarget);
-    console.log({
-      name: data.get('name'),
-      lastName: data.get('lastName'),
-      email: data.get('email'),
-      password: data.get('password'),
-    });
 
+    if (!validateInputs()) return; //todo: Is this a good idea? preventing the request send if validation fails, but it might be incorrect if server updates validation rules and they are not longer in sync with the frontend.
     const newUser = {
       name: formData.name,
-      username: formData.name + 'username',
+      username: formData.name + '_username',
       email: formData.email,
       password: formData.password,
+      profilePicture: formData.profilePicture,
     };
 
     try {
       const response = await api.post('/auth/signup', newUser);
       console.log(response);
       navigate('/sign-in');
-    } catch (error) {}
+
+    } catch (error: any) {
+      if (error.response && (error.response.status >= 400 || error.response.status <= 500)) {
+        console.log('4** error:', error.response.data.errorMessage)
+        setServerErrorMessage(error.response.data.errorMessage)
+      } else {
+        console.log(error?.response)
+        navigate("/error")
+      }
+    }
   };
 
   return (
     <AppTheme {...props}>
       <CssBaseline enableColorScheme />
       <ColorModeSelect sx={{ position: 'fixed', top: '1rem', right: '1rem' }} />
-      <SignUpContainer direction="column" justifyContent="space-between">
-        <Card variant="outlined">
-          <SitemarkIcon />
+      <SignContainer direction="column" justifyContent="space-between">
+        <CardForSignContainer variant="outlined">
+          {/* <SitemarkIcon /> */}
           <Typography
             component="h1"
             variant="h4"
@@ -179,7 +159,7 @@ export default function SignUp(props: { disableCustomTheme?: boolean }) {
                 required
                 fullWidth
                 id="name"
-                placeholder="Jon Snow"
+                placeholder="Your name"
                 error={nameError}
                 helperText={nameErrorMessage}
                 color={nameError ? 'error' : 'primary'}
@@ -199,38 +179,54 @@ export default function SignUp(props: { disableCustomTheme?: boolean }) {
                 variant="outlined"
                 error={emailError}
                 helperText={emailErrorMessage}
-                color={passwordError ? 'error' : 'primary'}
+                color={emailError ? 'error' : 'primary'}
                 value={formData.email}
                 onChange={handleOnChange}
               />
             </FormControl>
-            <FormControl>
+            <FormControl error={passwordError}>
               <FormLabel htmlFor="password">Password</FormLabel>
-              <TextField
+              <OutlinedInput
                 required
                 fullWidth
                 name="password"
                 placeholder="••••••"
-                type="password"
+                type={showPassword ? 'text' : 'password'}
                 id="password"
-                autoComplete="new-password"
-                variant="outlined"
-                error={passwordError}
-                helperText={passwordErrorMessage}
+                // autoComplete="new-password"
+                // variant="outlined"
+                // error={passwordError}
+                // helperText={passwordValidationRules}
                 color={passwordError ? 'error' : 'primary'}
                 value={formData.password}
                 onChange={handleOnChange}
+                endAdornment={
+                  <InputAdornment position='end'>
+                    <IconButton
+                      aria-label={showPassword ? 'hide the password' : 'display the password'}
+                      onClick={handleClickShowPassword}
+                      edge="end"
+                    >
+                      {showPassword ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
+                  </InputAdornment>
+                }
+                aria-describedby='password-helper-text'
               />
+              <FormHelperText id={"password-helper-text"}> {passwordErrorMessage !== '' ? passwordErrorMessage : passwordServerValidationRules} </FormHelperText>
             </FormControl>
             <Button
               type="submit"
               fullWidth
               variant="contained"
-              onClick={validateInputs}
             >
               Sign up
             </Button>
           </Box>
+          {serverErrorMessage !== ''
+            ? <Alert severity="error"> {serverErrorMessage}  </Alert>
+            : null
+          }
           <Divider>
             <Typography sx={{ color: 'text.secondary' }}>or</Typography>
           </Divider>
@@ -266,8 +262,8 @@ export default function SignUp(props: { disableCustomTheme?: boolean }) {
               </Link>
             </Typography>
           </Box>
-        </Card>
-      </SignUpContainer>
+        </CardForSignContainer>
+      </SignContainer>
     </AppTheme>
   );
 }
