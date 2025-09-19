@@ -53,12 +53,15 @@ function TimelinesPage() {
     position: 'right',
     open: false,
   });
+  const [usersData, setUsersData] = useState<IUser[] | null>(null);
   const navigate = useNavigate()
-
-
+    
+    
   useEffect(() => {
     getUserTimelines();
     getCollaborationTimelines();
+    getUsersData();
+
   }, []);
 
   const getUserTimelines = async () => {
@@ -70,6 +73,7 @@ function TimelinesPage() {
       console.log(error);
     }
   };
+  
   const getCollaborationTimelines = async () => {
     try {
       const response = await api.get('/timelines/collaborations');
@@ -78,6 +82,16 @@ function TimelinesPage() {
     } catch (error) {
       console.log(error);
     }
+  };
+
+  const getUsersData = async () => {
+      try {
+      const response = await api.get('/users');
+      console.log("All users data", response)
+      setUsersData(response.data);
+      } catch (error) {
+      console.log(error);
+      }
   };
   const openDeleteModal = useCallback((timeline: ITimeline) => {
     setSelectedTimeline(timeline);
@@ -115,7 +129,7 @@ function TimelinesPage() {
   }
 
   return (
-    <main className='relative flex flex-col gap-8'>
+    <main className='relative flex flex-col gap-8 m-auto'>
       <section className="user-timelines">
         <Typography variant="h3" component="h2">
           My timelines
@@ -129,6 +143,7 @@ function TimelinesPage() {
               timeline={timeline}
               onClickEditButton={() => openDrawerWithEditForm(timeline)}
               handleClickOnDeleteButton={() => openDeleteModal(timeline)}
+              allUsers={usersData ?? []}
             />
           ))}
         </CardsContainer>
@@ -143,7 +158,10 @@ function TimelinesPage() {
               key={timeline._id}
               timelineOwner="collaborator"
               timeline={timeline}
-              onClickEditButton={() => openDrawerWithEditForm(timeline)} />
+              onClickEditButton={() => openDrawerWithEditForm(timeline)} 
+              allUsers={usersData ?? []}
+
+            />
           ))}
         </CardsContainer>
       </section>
