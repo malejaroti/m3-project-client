@@ -38,6 +38,7 @@ export default function SignUp(props: { disableCustomTheme?: boolean }) {
     email: '',
     password: '',
     username: '',
+    profilePicture: ''
   });
   const navigate = useNavigate();
 
@@ -112,6 +113,7 @@ export default function SignUp(props: { disableCustomTheme?: boolean }) {
       username: formData.name + '_username',
       email: formData.email,
       password: formData.password,
+      profilePicture: formData.profilePicture,
     };
 
     try {
