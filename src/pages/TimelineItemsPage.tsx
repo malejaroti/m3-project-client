@@ -178,7 +178,7 @@ function TimelineItemsPage() {
 
           <div className="flex flex-wrap justify-left gap-20 mt-10 lg:flex-row sm:flex-col">
             {timelineItems.map((timelineItem) => (
-              <Card sx={{ maxWidth: 300, display: 'flex', flexDirection: 'column' }} key={timelineItem._id} className='p-5'>
+              <Card sx={{ maxHeight: 480, maxWidth:400, position:'relative', display: 'flex', flexDirection: 'column', alignItems:'center' }} key={timelineItem._id} className='p-5'>
                 {/* <CardActionArea> */}
                 {timelineItem.images.length !== 0 ?
                   <CardMedia
@@ -190,22 +190,23 @@ function TimelineItemsPage() {
                     }
                     alt="Timeline image"
                     sx={{
-                      minHeight: 400,
-                      objectFit: 'cover', //contain
+                      maxHeight: 250,
+                      // maxWidth:400,
+                      objectFit: 'contain', //contain
                       backgroundColor: '#f5f5f5',
                       padding: '2px 10px'
                     }}
                   />
                   : ""
                 }
-                <CardContent sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }} className="">
-                  <Typography gutterBottom variant="h5" component="div">
+                <CardContent sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', alignItems:'center' }} className="">
+                  <Typography gutterBottom variant="h5" component="div" sx={{marginBottom:'0px', textAlign:'center'}}>
                     {timelineItem.title}
                   </Typography>
                   <Typography variant="body1"
                     sx={{
                       color: 'text.secondary',
-                      paddingBottom: '5px'
+                      paddingBottom: '8px',
                     }}>
                     {`${new Intl.DateTimeFormat('en-GB').format(
                       new Date(timelineItem.startDate)
@@ -219,19 +220,27 @@ function TimelineItemsPage() {
                   </Typography>
                   <Typography variant="body2" sx={{
                     color: 'text.secondary',
+                    maxHeight: 100,
+                    textAlign:'justify',
+                    // border:1,
                     // display: '-webkit-box',
                     // WebkitLineClamp: 2,
                     // WebkitBoxOrient: 'vertical',
                     // // overflowY: 'scroll',
-                    // overflow: 'hidden',
+                    overflow: 'hidden',
                     // textOverflow: 'ellipsis'
                   }}>
                     {timelineItem.description}
                   </Typography>
+                </CardContent>
+                {/* </CardActionArea> */}
                   <Box sx={{
                     display: 'flex',
-                    marginTop: 'auto',
+                    // marginTop: 'auto',
                     alignSelf: 'flex-end',
+                    position:'absolute',
+                    bottom:'10px',
+                    // left:'10px'
                   }}
                     className="">
                     <IconButton
@@ -241,6 +250,7 @@ function TimelineItemsPage() {
                       sx={{
                         alignSelf: 'flex-end',
                         justifySelf: 'flex-end',
+                        color:'#d4d4d4',
                       }}
                     >
                       <Edit fontSize="small" />
@@ -252,14 +262,13 @@ function TimelineItemsPage() {
                       sx={{
                         alignSelf: 'flex-end',
                         justifySelf: 'flex-end',
+                        color:'#d4d4d4',
                       }}
                     >
                       <Delete fontSize="small" />
                     </IconButton>
 
                   </Box>
-                </CardContent>
-                {/* </CardActionArea> */}
               </Card>
             ))}
           </div>
