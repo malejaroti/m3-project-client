@@ -25,6 +25,7 @@ import api from '../../services/config.services';
 import { useNavigate } from 'react-router';
 import dayjs, { Dayjs } from 'dayjs';
 import { responsiveStyles } from '../../shared-theme/themePrimitives';
+import { FormControl } from '@mui/material';
 
 export type FormType = 'edit' | 'create' | null; //union
 
@@ -230,7 +231,7 @@ export default function ItemForm(props: ItemFormProps) {
 
       <FormContainer>
         <Grid container spacing={3}>
-          <FormGrid size={{ xs: 12, md: 6 }}>
+        <FormControl fullWidth>
             <FormLabel htmlFor="first-name" required sx={responsiveStyles.formLabel}>
               Item title
             </FormLabel>
@@ -241,12 +242,15 @@ export default function ItemForm(props: ItemFormProps) {
               placeholder="Title"
               autoComplete="item title"
               required
+              fullWidth
               size="small"
               sx={responsiveStyles.formInput}
               value={formData.title}
               onChange={handleFormDataChange}
             />
-          </FormGrid>
+          {/* </FormGrid> */}
+        </FormControl>
+          {/* <FormGrid size={{ xs: 12, md: 6 }}> */}
 
           <FormGrid size={{ xs: 12 }}>
             <FormLabel htmlFor="description" required sx={responsiveStyles.formLabel}>
