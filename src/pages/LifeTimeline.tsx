@@ -23,6 +23,55 @@ interface ITimelineWithItems {
 }
 type VisTimelineItem = DataItem & ITimelineItem
 
+function getYearStart(todayDate: Date) {
+    const year = todayDate.getFullYear()
+    // console.log("Year: ", year, "type of:", typeof year)
+    const firstDayOfYear = new Date (year, 0, 1) // January has monthIndex = 0
+    // console.log("First day of year: ", firstDayOfYear)
+    return firstDayOfYear
+}
+function getWeekStart(todayDate: Date) {
+    if (todayDate.getDay() === 1) {
+        return todayDate;
+    } else {
+        // Monday.getDay = 1 (day of the week)
+        const mondayDate = todayDate.getDate() - todayDate.getDay() + 1
+        const weekStartDate = new Date( todayDate.getFullYear(), todayDate.getMonth(), mondayDate )
+        // console.log("week start date: ", weekStartDate)
+        return weekStartDate;
+    }
+}
+function getWeekEnd(todayDate: Date) {
+    if (todayDate.getDay() === 0) {
+        // Sunday
+        return todayDate;
+    } else {
+        // Add (7 - day) to get to Sunday
+        const sundayDate = todayDate.getDate() + 8 - todayDate.getDay()
+        const weekEndDate = new Date( todayDate.getFullYear(), todayDate.getMonth(), sundayDate )
+        console.log("week end date: ", weekEndDate)
+        return weekEndDate;
+    }
+}
+
+function getMonthStart(todayDate: Date) {
+    if (todayDate.getDate() === 1) {
+        return todayDate;
+    } else {
+        const monthStartDate = new Date( todayDate.getFullYear(), todayDate.getMonth(), 1 )
+        console.log("Month start date: ", monthStartDate)
+        return monthStartDate;
+    }
+}
+function getMonthEnd(todayDate: Date) {
+    if (todayDate.getDate() === 1) {
+        return todayDate;
+    } else {
+        const monthEndDate = new Date( todayDate.getFullYear(), todayDate.getMonth() + 1 , 0, 23,59,0 )
+        console.log("Month end date: ", monthEndDate)
+        return monthEndDate;
+    }
+}
 
 function LifeTimeline() {
     const [timelinesWithItems, setTimelinesWithItems] = useState<ITimelineWithItems[]>();
@@ -37,6 +86,12 @@ function LifeTimeline() {
 
 
     const navigate = useNavigate()
+
+
+    const handleSetWindow = (startDate: string | Date, endDate: string | Date) => {
+        console.log("Set window to : ", startDate, "-", endDate)
+        timelineRef.current?.setWindow(startDate , endDate)
+    }
 
     useEffect(() => {
         if (!masterTimelineContainerRef.current) return;
@@ -140,10 +195,10 @@ function LifeTimeline() {
 
         // Initialize vis-timeline
         timelineRef.current = new Timeline(
-            masterTimelineContainerRef.current,
-            itemsDSRef.current,
-            groupsDSRef.current,
-            {
+            masterTimelineContainerRef.current, // container
+            itemsDSRef.current,                 // item
+            groupsDSRef.current,                // groups
+            {                                   // options
                 orientation: "top",
                 height: "100%",
                 stack: true,
@@ -160,6 +215,8 @@ function LifeTimeline() {
                 }
             }
         );
+        // // handleSetWindow("2025-01-01", "2025-09-21" )
+        // handleSetWindow(getYearStart(new Date()), new Date() )
 
         // Add selection event handler
         timelineRef.current.on('select', (properties) => {
@@ -177,19 +234,20 @@ function LifeTimeline() {
         });
 
         // Add resize observer for responsive behavior
-        const ro = new ResizeObserver(() => timelineRef.current?.redraw());
-        ro.observe(masterTimelineContainerRef.current);
+        // const ro = new ResizeObserver(() => timelineRef.current?.redraw());
+        // ro.observe(masterTimelineContainerRef.current);
 
-        return () => {
-            ro.disconnect();
-            timelineRef.current?.destroy();
-            timelineRef.current = null;
-            for (const [el, root] of rootsMapRef.current.entries()) {
-                root.unmount();
-                rootsMapRef.current.delete(el);
-            }
-        };
+        // return () => {
+        //     ro.disconnect();
+        //     timelineRef.current?.destroy();
+        //     timelineRef.current = null;
+        //     for (const [el, root] of rootsMapRef.current.entries()) {
+        //         root.unmount();
+        //         rootsMapRef.current.delete(el);
+        //     }
+        // };
     }, [timelines, timelinesWithItems])
+    
 
 
     useEffect(() => {
@@ -224,7 +282,7 @@ function LifeTimeline() {
     const getTimelinesData = async () => {
         try {
             const response = await api.get("/timelines")
-            console.log("Timelines data: ", response.data)
+            // console.log("Timelines data: ", response.data)
             setTimelines(response.data)
         } catch (error) {
             console.log(error)
@@ -237,7 +295,7 @@ function LifeTimeline() {
             try {
                 const promises = timelines.map(async (eachTimeline) => {
                     const response = await api.get(`/timelines/${eachTimeline._id}/items`);
-                    console.log(`response items timeline ${eachTimeline.title}: `, response)
+                    // console.log(`response items timeline ${eachTimeline.title}: `, response)
                     return {
                         timelineTitle: eachTimeline.title,
                         timelineColor: eachTimeline.color || 'gray',
@@ -269,7 +327,6 @@ function LifeTimeline() {
                         height: '2rem'
                     }}
                     onClick={() => setImageItemsVisibility(s => !s)}
-                // onClick={onClick}
                 >
                     {imageItemsVisibility ? (
                         <div className=" flex gap-2">
@@ -280,6 +337,50 @@ function LifeTimeline() {
                             <Visibility /> See items images
                         </div>
                     )}
+                </Button>
+                <Button
+                    variant="outlined"
+                    size='small'
+                    sx={{
+                        fontSize: { xs: "0.7rem", sm: "0.85rem", md: "0.8rem" },
+                        px: { xs: 1, sm: 2, md: 1 },
+                        py: { xs: 0.5, sm: 1, md: 0 },
+                        height: '2rem'
+                    }}
+                    // onClick={() => handleSetWindow("2025-01-01", "2025-09-21" )}
+                    onClick={() => handleSetWindow(getYearStart(new Date()), new Date())}
+                >
+                    This year
+                </Button>
+                <Button
+                    variant="outlined"
+                    size='small'
+                    sx={{
+                        fontSize: { xs: "0.7rem", sm: "0.85rem", md: "0.8rem" },
+                        px: { xs: 1, sm: 2, md: 1 },
+                        py: { xs: 0.5, sm: 1, md: 0 },
+                        height: '2rem'
+                    }}
+                    // onClick={() => handleSetWindow("2025-01-01", "2025-09-21" )}
+                    onClick={() => handleSetWindow(getMonthStart(new Date()), getMonthEnd(new Date()))}
+                    // onClick={() => handleSetWindow(new Date("2025-09-22"), new Date("2025-09-23"))}
+                >
+                    This month
+                </Button>
+                <Button
+                    variant="outlined"
+                    size='small'
+                    sx={{
+                        fontSize: { xs: "0.7rem", sm: "0.85rem", md: "0.8rem" },
+                        px: { xs: 1, sm: 2, md: 1 },
+                        py: { xs: 0.5, sm: 1, md: 0 },
+                        height: '2rem'
+                    }}
+                    // onClick={() => handleSetWindow("2025-01-01", "2025-09-21" )}
+                    onClick={() => handleSetWindow(getWeekStart(new Date()), getWeekEnd(new Date()))}
+                    // onClick={() => handleSetWindow(new Date("2025-09-22"), new Date("2025-09-23"))}
+                >
+                    This week
                 </Button>
             </div>
 
