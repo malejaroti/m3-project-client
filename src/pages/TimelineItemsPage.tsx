@@ -1,4 +1,4 @@
-import { useEffect, useState, Fragment, useCallback, useMemo } from 'react';
+import { useEffect, useState, Fragment, useCallback, useMemo, useRef } from 'react';
 import api from '../services/config.services';
 import { Link, useNavigate, useParams } from 'react-router';
 
@@ -86,6 +86,7 @@ function TimelineItemsPage() {
   });
   const [openModal, setOpenModal] = useState(false);
   const [selected, setSelected] = useState<(string | number)[]>([]);
+  const visTimelineContainerRef =  useRef<HTMLDivElement | null>(null);
 
   const navigate = useNavigate()
 
@@ -93,6 +94,13 @@ function TimelineItemsPage() {
     getTimelineDetails();
     getTimelineItems();
   }, []);
+
+  useEffect(() => {
+    const visTimelineContainer = visTimelineContainerRef.current;
+    console.log(visTimelineContainer)
+
+  }, [])
+  
 
   const getTimelineDetails = async () => {
     try {
@@ -164,8 +172,8 @@ function TimelineItemsPage() {
 
   return (
     <>
-      <main className="relative">
-        <section className="gallery-timeline-items m-5">
+      <main className="relative h-full flex flex-col p-5 gap-10">
+        <section className="gallery-timeline-items">
           <Typography variant="h3" component="h2">
             {timelineDetails?.title}
           </Typography>
@@ -176,10 +184,18 @@ function TimelineItemsPage() {
 
           </Grid> */}
 
-          <div className="flex flex-wrap justify-left gap-20 mt-10 lg:flex-row sm:flex-col">
+          <div className="flex justify-left gap-20 mt-10 lg:flex-row sm:flex-col max-h-[600px] overflow-x-scroll max-w-screen">
             {timelineItems.map((timelineItem) => (
-              <Card sx={{ maxHeight: 480, maxWidth:400, position:'relative', display: 'flex', flexDirection: 'column', alignItems:'center' }} key={timelineItem._id} className='p-5'>
-                {/* <CardActionArea> */}
+              <Card sx={{ 
+                maxHeight: 480, 
+                minWidth:400, 
+                position:'relative', 
+                display: 'flex', 
+                flexDirection: 'column', 
+                alignItems:'center', 
+                backgroundColor: '#e2e8f0',
+                justifyContent:'center' 
+              }} key={timelineItem._id} className='p-5'>
                 {timelineItem.images.length !== 0 ?
                   <CardMedia
                     component="img"
@@ -199,7 +215,13 @@ function TimelineItemsPage() {
                   />
                   : ""
                 }
-                <CardContent sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', alignItems:'center' }} className="">
+                <CardContent sx={{ 
+                  display: 'flex', 
+                  flexDirection: 'column', 
+                  alignItems:'center',
+                  width:'100%',
+                  backgroundColor: timelineItem.images.length === 0 ? '#f5f5f5' : 'transparent'
+                }} className="">
                   <Typography gutterBottom variant="h5" component="div" sx={{marginBottom:'0px', textAlign:'center'}}>
                     {timelineItem.title}
                   </Typography>
@@ -233,7 +255,6 @@ function TimelineItemsPage() {
                     {timelineItem.description}
                   </Typography>
                 </CardContent>
-                {/* </CardActionArea> */}
                   <Box sx={{
                     display: 'flex',
                     // marginTop: 'auto',
@@ -273,6 +294,16 @@ function TimelineItemsPage() {
             ))}
           </div>
         </section>
+
+
+        <section className='border flex-1 '>
+            <div ref={visTimelineContainerRef} className=' border bg-sky-300'>
+              
+            </div>
+
+        </section>
+
+
         {/* <section>
           <h2>Timeline</h2>
           <TimelineWidget
@@ -297,7 +328,8 @@ function TimelineItemsPage() {
         <AddButton onClick={() => openDrawerCreate('right')} buttonLabel='Add new item' />
 
 
-        <div>
+      </main>
+      <div>
           <Drawer
             anchor={drawerState.position}
             open={drawerState.open}
@@ -366,8 +398,7 @@ function TimelineItemsPage() {
             </Fade>
           </Modal>
           {/* <DeleteModal modalState={openModal}  modalStateSetter={setOpenModal} handleDelete={handleItemDelete}/> */}
-        </div>
-      </main>
+      </div>
     </>
   );
 }
