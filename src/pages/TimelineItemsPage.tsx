@@ -25,6 +25,7 @@ import FleetTimeline from "../components/vis-timeline/FleetTimeline";
 import SimplerTimelineWidget from '../components/vis-timeline/simplerTimelineGptEx';
 import AddButton from '../components/AddButton';
 import DeleteModal from '../components/DeleteModal';
+import TimelineItemCard from '../components/TimelineItemCard';
 
 
 
@@ -186,111 +187,11 @@ function TimelineItemsPage() {
 
           <div className="flex justify-left gap-20 mt-10 lg:flex-row sm:flex-col max-h-[600px] overflow-x-scroll max-w-screen">
             {timelineItems.map((timelineItem) => (
-              <Card sx={{ 
-                maxHeight: 480, 
-                minWidth:400, 
-                position:'relative', 
-                display: 'flex', 
-                flexDirection: 'column', 
-                alignItems:'center', 
-                backgroundColor: '#e2e8f0',
-                justifyContent:'center' 
-              }} key={timelineItem._id} className='p-5'>
-                {timelineItem.images.length !== 0 ?
-                  <CardMedia
-                    component="img"
-                    image={
-                      timelineItem.images && timelineItem.images.length > 0
-                        ? timelineItem.images[0]
-                        : undefined
-                    }
-                    alt="Timeline image"
-                    sx={{
-                      maxHeight: 250,
-                      // maxWidth:400,
-                      objectFit: 'contain', //contain
-                      backgroundColor: '#f5f5f5',
-                      padding: '2px 10px'
-                    }}
-                  />
-                  : ""
-                }
-                <CardContent sx={{ 
-                  display: 'flex', 
-                  flexDirection: 'column', 
-                  alignItems:'center',
-                  width:'100%',
-                  backgroundColor: timelineItem.images.length === 0 ? '#f5f5f5' : 'transparent'
-                }} className="">
-                  <Typography gutterBottom variant="h5" component="div" sx={{marginBottom:'0px', textAlign:'center'}}>
-                    {timelineItem.title}
-                  </Typography>
-                  <Typography variant="body1"
-                    sx={{
-                      color: 'text.secondary',
-                      paddingBottom: '8px',
-                    }}>
-                    {`${new Intl.DateTimeFormat('en-GB').format(
-                      new Date(timelineItem.startDate)
-                    )}`}
-                    {timelineItem.startDate === timelineItem.endDate ? "" :
-                      timelineItem.endDate
-                        ? ` - ${new Intl.DateTimeFormat('en-GB').format(
-                          new Date(timelineItem.endDate)
-                        )}`
-                        : ' - Present'}
-                  </Typography>
-                  <Typography variant="body2" sx={{
-                    color: 'text.secondary',
-                    maxHeight: 100,
-                    textAlign:'justify',
-                    // border:1,
-                    // display: '-webkit-box',
-                    // WebkitLineClamp: 2,
-                    // WebkitBoxOrient: 'vertical',
-                    // // overflowY: 'scroll',
-                    overflow: 'hidden',
-                    // textOverflow: 'ellipsis'
-                  }}>
-                    {timelineItem.description}
-                  </Typography>
-                </CardContent>
-                  <Box sx={{
-                    display: 'flex',
-                    // marginTop: 'auto',
-                    alignSelf: 'flex-end',
-                    position:'absolute',
-                    bottom:'10px',
-                    // left:'10px'
-                  }}
-                    className="">
-                    <IconButton
-                      aria-label="Edit item"
-                      onClick={() => openDrawerEdit(timelineItem, 'right')}
-                      size="small"
-                      sx={{
-                        alignSelf: 'flex-end',
-                        justifySelf: 'flex-end',
-                        color:'#d4d4d4',
-                      }}
-                    >
-                      <Edit fontSize="small" />
-                    </IconButton>
-                    <IconButton
-                      aria-label="Delete item"
-                      onClick={() => handleClickOnTrashIcon(timelineItem)}
-                      size="small"
-                      sx={{
-                        alignSelf: 'flex-end',
-                        justifySelf: 'flex-end',
-                        color:'#d4d4d4',
-                      }}
-                    >
-                      <Delete fontSize="small" />
-                    </IconButton>
-
-                  </Box>
-              </Card>
+              <TimelineItemCard
+                timelineItem={timelineItem}
+                callbackOnClickEdit={() => openDrawerEdit(timelineItem, 'right')}
+                callbackOnClickTrash={() => handleClickOnTrashIcon(timelineItem)}
+              ></TimelineItemCard>
             ))}
           </div>
         </section>
