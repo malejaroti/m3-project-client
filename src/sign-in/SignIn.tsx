@@ -18,6 +18,7 @@ import api from '../services/config.services';
 import { AuthContext } from '../context/auth.context';
 import { useNavigate } from 'react-router';
 import { SignContainer, CardForSignContainer } from '../components/styled/Sytled_AuthForms';
+import { Alert } from '@mui/material';
 
 export default function SignIn(props: { disableCustomTheme?: boolean }) {
   const authContext = React.useContext(AuthContext);
@@ -31,6 +32,7 @@ export default function SignIn(props: { disableCustomTheme?: boolean }) {
   const [passwordError, setPasswordError] = React.useState(false);
   const [passwordErrorMessage, setPasswordErrorMessage] = React.useState('');
   const [open, setOpen] = React.useState(false);
+  const [serverErrorMsg, setServerErrorMsg] = React.useState("");
   const [formData, setFormData] = React.useState({
     email: '',
     password: '',
@@ -64,14 +66,19 @@ export default function SignIn(props: { disableCustomTheme?: boolean }) {
     //   email: data.get('email'),
     //   password: data.get('password'),
     // });
+
     const userCredentials = {
       email: formData.email,
       password: formData.password,
     };
-    console.log('user credentials', userCredentials);
+    console.log('user credentials', userCredentials); //TODO: Delete later
+
     try {
       const response = await api.post('/auth/login', userCredentials);
       console.log('login response', response);
+      if(response.status === 200){
+        setServerErrorMsg("")
+      }
 
       //* the user is now authenticated
 
@@ -80,13 +87,14 @@ export default function SignIn(props: { disableCustomTheme?: boolean }) {
       await authenticateUser(); // this verifies that the token was correctly stored and is valid. Also it updates the context states.
 
       navigate('/timelines');
-    } catch (error) {
-      console.log(error);
-      //   if (error.response && error.response.status === 400 ) {
-      //     setErrorMessage(error.response.data.errorMessage)
-      //   } else {
-      //     navigate("/error")
-      //   }
+    } catch (error: any) {
+      console.log("Login error:", error);
+      if (error.response && error.response.status === 400 && error.response.data && error.response.data.errorMessage ) {
+        console.log("Error message:", error.response.data.errorMessage);
+        setServerErrorMsg(error.response.data.errorMessage)
+      }else{
+        navigate("/error")
+      }
     }
   };
 
@@ -194,6 +202,14 @@ export default function SignIn(props: { disableCustomTheme?: boolean }) {
             >
               Sign in
             </Button>
+            {
+              serverErrorMsg !== ""
+              ?
+                <Alert severity='error'>
+                  {serverErrorMsg}
+                </Alert>
+              : null
+            }
             {/* <Link
               component="button"
               type="button"
