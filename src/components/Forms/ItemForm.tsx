@@ -82,6 +82,18 @@ export default function ItemForm(props: ItemFormProps) {
   );
   const navigate = useNavigate();
 
+  const datePickerSlotProps = {
+      popper: {
+          disablePortal: false,              // ensure it portals to <body>
+          placement: 'bottom-start',
+          modifiers: [
+          { name: 'preventOverflow', options: { altBoundary: true, rootBoundary: 'viewport', padding: 8 } },
+          { name: 'flip', options: { altBoundary: true } }
+          ],
+          style: { zIndex: 1800 }            // higher than drawer/content
+      },
+      textField: { fullWidth: true }
+  };
   const handleFormDataChange = (
     event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
@@ -232,7 +244,7 @@ export default function ItemForm(props: ItemFormProps) {
       <FormContainer>
         <Grid container spacing={3}>
         <FormControl fullWidth>
-            <FormLabel htmlFor="first-name" required sx={responsiveStyles.formLabel}>
+            <FormLabel htmlFor="title" required sx={responsiveStyles.formLabel}>
               Item title
             </FormLabel>
             <OutlinedInput
@@ -253,7 +265,7 @@ export default function ItemForm(props: ItemFormProps) {
           {/* <FormGrid size={{ xs: 12, md: 6 }}> */}
 
           <FormGrid size={{ xs: 12 }}>
-            <FormLabel htmlFor="description" required sx={responsiveStyles.formLabel}>
+            <FormLabel htmlFor="description" sx={responsiveStyles.formLabel}>
               Description
             </FormLabel>
             <OutlinedInput
@@ -262,7 +274,6 @@ export default function ItemForm(props: ItemFormProps) {
               type="description"
               placeholder="Item description"
               autoComplete="description"
-              required
               size="small"
               sx={responsiveStyles.formInput}
               multiline
@@ -284,7 +295,7 @@ export default function ItemForm(props: ItemFormProps) {
                 value={startDateValue}
                 onChange={(newValue) => setStartDateValue(newValue)}
                 // onChange={handleFormDataChange}
-                slotProps={{ textField: { fullWidth: true, id: 'start-date' } }}
+                slotProps={{ textField: { fullWidth: true, id: 'start-date', size:'small' } }}
               />
             </LocalizationProvider>
           </FormGrid>
@@ -300,7 +311,7 @@ export default function ItemForm(props: ItemFormProps) {
                   name="EndDate"
                   value={endDateValue}
                   onChange={(newValue) => setEndDateValue(newValue)}
-                  slotProps={{ textField: { fullWidth: true, id: 'end-date' } }}
+                  slotProps={{ textField: { fullWidth: true, id: 'end-date', size:'small' } }}
                 // sx={allDayEvent ? { display: "inline-block" } : { display: "none" }}
                 />
               </LocalizationProvider>
@@ -354,7 +365,7 @@ export default function ItemForm(props: ItemFormProps) {
             flexDirection: 'row',
             alignItems: 'center',
             justifyContent: 'space-evenly',
-            marginTop: { xs: 2, sm: 5, md: 10 },
+            // marginTop: { xs: 2, sm: 5, md: 10 },
           }}
           className=''
         >
