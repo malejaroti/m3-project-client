@@ -5,7 +5,7 @@ import api from "../services/config.services";
 import type { ITimeline } from "./TimelinesPage";
 import type { ITimelineItem } from "./TimelineItemsPage";
 import Typography from "@mui/material/Typography";
-import { DataSet } from "vis-data";
+import { DataSet, DataView } from "vis-data";
 import type { DataGroup, DataItem } from "vis-timeline";
 import { Timeline } from "vis-timeline/standalone";
 import { createRoot, type Root } from "react-dom/client";
@@ -25,9 +25,7 @@ type VisTimelineItem = DataItem & ITimelineItem
 
 function getYearStart(todayDate: Date) {
     const year = todayDate.getFullYear()
-    // console.log("Year: ", year, "type of:", typeof year)
-    const firstDayOfYear = new Date (year, 0, 1) // January has monthIndex = 0
-    // console.log("First day of year: ", firstDayOfYear)
+    const firstDayOfYear = new Date(year, 0, 1, 0, 0, 0, 0)
     return firstDayOfYear
 }
 function getWeekStart(todayDate: Date) {
@@ -55,22 +53,10 @@ function getWeekEnd(todayDate: Date) {
 }
 
 function getMonthStart(todayDate: Date) {
-    if (todayDate.getDate() === 1) {
-        return todayDate;
-    } else {
-        const monthStartDate = new Date( todayDate.getFullYear(), todayDate.getMonth(), 1 )
-        console.log("Month start date: ", monthStartDate)
-        return monthStartDate;
-    }
+    return new Date(todayDate.getFullYear(), todayDate.getMonth(), 1, 0, 0, 0, 0);
 }
 function getMonthEnd(todayDate: Date) {
-    if (todayDate.getDate() === 1) {
-        return todayDate;
-    } else {
-        const monthEndDate = new Date( todayDate.getFullYear(), todayDate.getMonth() + 1 , 0, 23,59,0 )
-        console.log("Month end date: ", monthEndDate)
-        return monthEndDate;
-    }
+    return new Date(todayDate.getFullYear(), todayDate.getMonth() + 1, 0, 23, 59, 59, 999);
 }
 
 function LifeTimeline() {
@@ -81,16 +67,16 @@ function LifeTimeline() {
     const masterTimelineContainerRef = useRef<HTMLDivElement | null>(null);
     const timelineRef = useRef<Timeline | null>(null);
     const itemsDSRef = useRef<DataSet<VisTimelineItem> | null>(null);
+    const itemsViewRef = useRef<DataView<VisTimelineItem> | null>(null);
     const groupsDSRef = useRef<DataSet<DataGroup> | null>(null);
     const rootsMapRef = useRef<Map<Element, Root>>(new Map());
-
+    const currentWindowRef = useRef<{ start: Date; end: Date } | null>(null);
 
     const navigate = useNavigate()
 
-
     const handleSetWindow = (startDate: string | Date, endDate: string | Date) => {
-        console.log("Set window to : ", startDate, "-", endDate)
-        timelineRef.current?.setWindow(startDate , endDate)
+        // console.log("Set window to : ", startDate, "-", endDate)
+        timelineRef.current?.setWindow(startDate, endDate)
     }
 
     useEffect(() => {
@@ -103,11 +89,11 @@ function LifeTimeline() {
                 const startDate = new Date(item.startDate);
                 let endDate: Date | undefined;
 
-
+                // If no endDate provided, EndDate is today.
                 if (!item.endDate) {
                     endDate = new Date();
                 }
-                // Handle one-day events: if no endDate is same as startDate, make it a full day block
+                // Handle one-day events: if endDate is same as startDate, make it a full day block
                 else if (item.startDate === item.endDate) {
                     endDate = new Date(startDate);
                     endDate.setDate(endDate.getDate() + 1); // Add one day to make it a block
@@ -117,17 +103,13 @@ function LifeTimeline() {
 
                 return {
                     ...item,
-                    id: item._id, // Map MongoDB _id to vis-timeline id
-                    // content: `<div class="test"> ${item.title} </div>`,
+                    id: item._id, //use MongoDB itemId as id for VisItem
                     content: `<div>${item.title}</div>${imageItemsVisibility && item.images && item.images.length > 0 ? `<img src="${item.images[0]}" style="width:32px; height:32px; border-radius: 4px; margin-top: 4px;">` : ''}`,
-
                     start: startDate,
                     end: endDate,
-                    group: timelineIndex + 1, // Each timeline gets its own group
-                    // className: `timeline-group-${timelineIndex + 1}`, // Add custom class
-                    // style: `--item-color: ${timelinesWithItems[timelineIndex].timelineColor}`, // Add inline CSS variable
-                    style: `--item-color: #e7e4d7; border: 0.5px solid #d4d4d4`, // Add inline CSS variable
-
+                    group: timelineIndex + 1,
+                    type: endDate ? 'range' : 'box',
+                    style: `--item-color: #e7e4d7; border: 0.5px solid #d4d4d4`,
                 };
             })
         );
@@ -138,35 +120,26 @@ function LifeTimeline() {
             content: timeline.timelineTitle,
         }));
 
-        // Set CSS custom properties for each timeline's color AND create dynamic CSS rules
+        // Set CSS custom properties for group colors (kept as in your code)
         timelinesWithItems.forEach((timeline, index) => {
             const groupId = index + 1;
             if (masterTimelineContainerRef.current) {
-                // Set CSS variable
                 masterTimelineContainerRef.current.style.setProperty(
                     `--timeline-${groupId}-color`,
                     getTimelineColor(index, { groupId })
-                    // " rgba(255, 192, 203, 0.5)"
                 );
-
-                // Check if style element exists, if not create it
                 let styleElement = document.getElementById('dynamic-timeline-styles') as HTMLStyleElement;
                 if (!styleElement) {
                     styleElement = document.createElement('style');
                     styleElement.id = 'dynamic-timeline-styles';
                     document.head.appendChild(styleElement);
                 }
-
-                // Create dynamic CSS rules for both items and groups
                 const cssRules = [
-
-                    // Rule for group labels background
                     `.vis-label.vis-group-level-0:nth-child(${groupId}) { 
                         background-color: var(--timeline-${groupId}-color,  rgba(255, 192, 203, 0.5)) !important;
                         border-radius: 4px !important;
                         padding: 4px 8px !important;
                     }`,
-                    // Alternative selector in case the data-group attribute doesn't work
                     `.vis-foreground .vis-group:nth-child(${groupId}) { 
                         background-color: var(--timeline-${groupId}-color,  rgba(255, 192, 203, 0.5)) !important;
                         color: white !important;
@@ -174,81 +147,71 @@ function LifeTimeline() {
                         padding: 4px 8px !important;
                     }`
                 ];
-
-                // Add all CSS rules
                 if (styleElement.sheet) {
                     cssRules.forEach(cssRule => {
                         try {
                             styleElement.sheet!.insertRule(cssRule, styleElement.sheet!.cssRules.length);
-                        } catch (e) {
-                            // Rule might already exist, that's okay
-                            console.log('CSS rule already exists or invalid:', e);
-                        }
+                        } catch { }
                     });
                 }
             }
         });
 
-        // Initialize DataSets
+        // Initialize DataSets and DataView (filtered by current window)
         itemsDSRef.current = new DataSet<VisTimelineItem>(visTimelineItems);
         groupsDSRef.current = new DataSet<DataGroup>(groups);
 
-        // Initialize vis-timeline
+        const initialStart = getYearStart(new Date());
+        const initialEnd = new Date();
+        currentWindowRef.current = { start: initialStart, end: initialEnd };
+
+        itemsViewRef.current = new DataView(itemsDSRef.current, {
+            filter: (item) => {
+                const win = currentWindowRef.current;
+                if (!win) return true;
+                const itemStart = (item.start as Date).getTime();
+                const itemEnd = item.end ? (item.end as Date).getTime() : itemStart; // box as point
+                // Render only items that intersect the visible window
+                return itemStart <= win.end.getTime() && itemEnd >= win.start.getTime();
+            }
+        });
+
+        // Initialize vis-timeline with explicit start and end
         timelineRef.current = new Timeline(
-            masterTimelineContainerRef.current, // container
-            itemsDSRef.current,                 // item
-            groupsDSRef.current,                // groups
-            {                                   // options
+            masterTimelineContainerRef.current,
+            itemsViewRef.current, // use filtered view
+            groupsDSRef.current,
+            {
                 orientation: "top",
                 height: "100%",
                 stack: true,
                 selectable: true,
                 zoomKey: "ctrlKey",
-                xss: {
-                    disabled: true  // Allow HTML content
-                },
-                margin: {
-                    item: {
-                        horizontal: 10,
-                        vertical: 10
-                    }
-                }
+                start: initialStart,
+                end: initialEnd,
+                xss: { disabled: true },
+                margin: { item: { horizontal: 10, vertical: 10 } }
             }
         );
-        // // handleSetWindow("2025-01-01", "2025-09-21" )
-        // handleSetWindow(getYearStart(new Date()), new Date() )
 
-        // Add selection event handler
+        // Keep the view in sync when the window changes (drag, zoom, or setWindow)
+        timelineRef.current.on('rangechange', (props: any) => {
+            currentWindowRef.current = { start: new Date(props.start), end: new Date(props.end) };
+            itemsViewRef.current?.refresh();
+        });
+
+        // Selection -> details
         timelineRef.current.on('select', (properties) => {
             if (properties.items.length > 0) {
                 const selectedItemId = properties.items[0];
-                // Find the selected item in our data
-                const foundItem = timelinesWithItems.flatMap(timeline => timeline.items)
+                const foundItem = timelinesWithItems.flatMap(tl => tl.items)
                     .find(item => item._id === selectedItemId);
-                if (foundItem) {
-                    setSelectedItem(foundItem);
-                }
+                setSelectedItem(foundItem ?? null);
             } else {
                 setSelectedItem(null);
             }
         });
-
-        // Add resize observer for responsive behavior
-        // const ro = new ResizeObserver(() => timelineRef.current?.redraw());
-        // ro.observe(masterTimelineContainerRef.current);
-
-        // return () => {
-        //     ro.disconnect();
-        //     timelineRef.current?.destroy();
-        //     timelineRef.current = null;
-        //     for (const [el, root] of rootsMapRef.current.entries()) {
-        //         root.unmount();
-        //         rootsMapRef.current.delete(el);
-        //     }
-        // };
     }, [timelines, timelinesWithItems])
-    
-
 
     useEffect(() => {
         getTimelinesData()
@@ -273,11 +236,12 @@ function LifeTimeline() {
 
         try {
             (itemsDSRef.current as any).update(updates);
+            // DataView will pass through updates automatically
             timelineRef.current.redraw();
         } catch (e) {
             console.warn('Failed to update items content on toggle', e);
         }
-    }, [imageItemsVisibility, timelinesWithItems]);
+    }, [imageItemsVisibility, timelinesWithItems])
 
     const getTimelinesData = async () => {
         try {
@@ -304,7 +268,7 @@ function LifeTimeline() {
                 });
 
                 const timelinesWithItemsData = await Promise.all(promises);
-                console.log(timelinesWithItemsData)
+                // console.log(timelinesWithItemsData)
                 setTimelinesWithItems(timelinesWithItemsData);
             } catch (error) {
                 console.error('Error fetching timeline items:', error);
@@ -363,7 +327,7 @@ function LifeTimeline() {
                     }}
                     // onClick={() => handleSetWindow("2025-01-01", "2025-09-21" )}
                     onClick={() => handleSetWindow(getMonthStart(new Date()), getMonthEnd(new Date()))}
-                    // onClick={() => handleSetWindow(new Date("2025-09-22"), new Date("2025-09-23"))}
+                // onClick={() => handleSetWindow(new Date("2025-09-22"), new Date("2025-09-23"))}
                 >
                     This month
                 </Button>
@@ -378,7 +342,7 @@ function LifeTimeline() {
                     }}
                     // onClick={() => handleSetWindow("2025-01-01", "2025-09-21" )}
                     onClick={() => handleSetWindow(getWeekStart(new Date()), getWeekEnd(new Date()))}
-                    // onClick={() => handleSetWindow(new Date("2025-09-22"), new Date("2025-09-23"))}
+                // onClick={() => handleSetWindow(new Date("2025-09-22"), new Date("2025-09-23"))}
                 >
                     This week
                 </Button>
