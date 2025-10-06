@@ -141,37 +141,22 @@ function TimelineCard(props: TimelineCardProps) {
 
   return (
     <>
-      <Card sx={{ width: 300 }} key={props.timeline._id}>
+      <Card sx={{ width: 250 }} key={props.timeline._id}>
         <CardActionArea component={Link} to={`/timeline/${props.timeline._id}`} sx={{ height: '100%' }} >
-          {/* { props.timeline.icon === "" 
-            ? <CardMedia
-                component="img"
-                height="140"
-                image={props.timeline.icon}
-                alt="Timeline image"
-                sx={{
-                  maxHeight: 250,
-                  objectFit: 'cover', //contain
-                  backgroundColor: '#f5f5f5',
-                  padding: '2px 10px'
-                }}
-              />
-            : ""
-        } */}
           <CardContent sx={{ display: 'flex', flexDirection: 'column', height: '100%', justifyContent: 'space-between', backgroundColor: '#e2e8f0' }}>
             <div className="flex items-center gap-[8px] mb-[10px] ">
               {/* Timeline icon */}
               {props.timeline.icon && props.timeline.icon !== ""
-                ? <img src={props.timeline.icon} alt="timeline icon" className="size-[50px]" />
+                ? <img src={props.timeline.icon} alt="timeline icon" className="size-[35px]" />
                 : null
               }
-              <Typography variant="h4" className="self-center">
+              <Typography variant="h5" className="self-center">
                 {props.timeline.title}
               </Typography>
             </div>
 
-            <Typography variant="body1"
-              sx={responsiveFontSize}
+            <Typography variant="body2"
+              // sx={responsiveFontSize}
             >
               {props.timeline.description}
             </Typography>
@@ -193,18 +178,19 @@ function TimelineCard(props: TimelineCardProps) {
               {/* Collaborators box */}
               {
                 props.timelineOwner === "loggedUser" && props.timeline.collaborators && props.timeline.collaborators.length > 0 &&
-                <div className="collaborators-box flex flex-col gap-3">
-                  <Typography sx={{ fontSize: { xs: '10px', md: '11px', lg: '13px' }, fontStyle: 'italic' }}>
+                <div className="collaborators-box flex flex-col gap-1">
+                  <Typography sx={{ fontSize: { xs: '10px', md: '11px', lg: '13px' }, fontStyle: 'italic', mb:'0px' }}>
                     Collaborators:
                   </Typography>
-                  <div className="flex gap-3 ">
+                  <div className="flex gap-1 ">
                     {
                       props.timeline.collaborators?.map((collaborator) => (
-                        <div key={collaborator.name} className="flex flex-col">
-                          <Typography sx={{ fontSize: { xs: '10px', md: '11px', lg: '13px' } }}>
-                            {collaborator.name && (collaborator.name).split(" ", 1)}
+                        <div key={collaborator.name} className="flex flex-col items-center">
+                          <Typography sx={{ fontSize: { xs: '10px', md: '11px', lg: '10px' } }}>
+                            {collaborator.name && (collaborator.name).slice(0,4)}
                           </Typography>
-                          <img src={collaborator?.profilePicture !== "" ? collaborator.profilePicture : defaultAvatar} alt="collaborator picture" className="w-[40px] border-1 border-slate-500 aspect-square rounded-full object-cover" />
+                          <img src={collaborator?.profilePicture !== "" ? collaborator.profilePicture : defaultAvatar} alt="collaborator picture" 
+                              className="w-[30px] border-1 border-slate-500 aspect-square rounded-full object-cover" />
                         </div>
                       ))
                     }
