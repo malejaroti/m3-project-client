@@ -1,12 +1,12 @@
 import { useContext, useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router';
-import { AuthContext } from '../context/auth.context';
+import { AuthContext } from '../../context/auth.context';
 import Typography from '@mui/material/Typography';
 import { styled } from '@mui/material/styles';
 import Button from '@mui/material/Button';
-import defaultAvatar from "../assets/default-avatar.jpg"
-import api from '../services/config.services';
-import type { IUser } from '../pages/UserProfilePage';
+import defaultAvatar from "../../assets/default-avatar.jpg"
+import api from '../../services/config.services';
+import type { IUser } from '../../pages/UserProfilePage';
 
 
 
@@ -26,7 +26,7 @@ const LogoutButton = styled('button')(() => ({
   background: 'gray',
   border: 'none',
   borderRadius: '8px',
-  padding: '8px 16px',
+  padding: '6px 16px',
   cursor: 'pointer',
   color: 'white',
   boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
@@ -66,17 +66,17 @@ function Navbar() {
   const [userData, setUserData] = useState<IUser | null>(null);
 
   useEffect(() => {
-      getUserData();
+    getUserData();
   }, []);
 
   const getUserData = async () => {
-      try {
+    try {
       const response = await api.get('/users/logged-user');
       console.log("user data", response)
       setUserData(response.data);
-      } catch (error) {
+    } catch (error) {
       console.log(error);
-      }
+    }
   };
 
   const handleLogout = async () => {
@@ -95,19 +95,19 @@ function Navbar() {
   };
 
   return (
-    <nav className="w-full justify-center items-center bg-slate-200 mb-5">
+    <nav className="sticky top-0 z-50 w-full justify-center items-center bg-slate-200 fixed">
       <div className="flex justify-between items-center py-2 px-4">
         {/* Left side - Navigation links */}
         <ul className="flex gap-6 items-center w-full justify-around">
           {/* public links */}
-          { !isLoggedIn &&
-          <li>
-            <NavLink to="/">
-              <Typography variant="h6" sx={navLinkStyles}>
-                Home
-              </Typography>
-            </NavLink>
-          </li>
+          {!isLoggedIn &&
+            <li>
+              <NavLink to="/">
+                <Typography variant="h6" sx={navLinkStyles}>
+                  Home
+                </Typography>
+              </NavLink>
+            </li>
           }
 
           {/* anon links */}
@@ -151,22 +151,22 @@ function Navbar() {
             </li>
           )}
         </ul>
-        
+
         {/* Right side of the navbar*/}
         <ul className='flex gap-6 items-center'>
           {/*  Logout button */}
           {isLoggedIn && (
-            <Button variant='outlined' onClick={handleLogout}>
-              <Typography variant="h6">
+            <Button variant='outlined' size='small' onClick={handleLogout}>
+              <Typography variant="body1">
                 Logout
               </Typography>
             </Button>
           )}
 
           {/* Profile picture */}
-          {isLoggedIn && ( 
+          {isLoggedIn && (
             <Link to={'/user-profile'}>
-              <img src={userData?.profilePicture? userData?.profilePicture : defaultAvatar} alt="User picture or avatar" className='w-[60px] border-1 border-slate-500 aspect-square rounded-full object-cover'/>
+              <img src={userData?.profilePicture ? userData?.profilePicture : defaultAvatar} alt="User picture or avatar" className='w-[60px] border-1 border-slate-500 aspect-square rounded-full object-cover' />
               {/* <img src={loggedUserPicture? loggedUserPicture : defaultAvatar} alt="User picture or avatar" className='w-[60px] border-1 border-slate-500 aspect-square rounded-full object-cover'/> */}
             </Link>
           )}
