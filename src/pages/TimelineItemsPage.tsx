@@ -1,21 +1,13 @@
-import { useEffect, useState, Fragment, useCallback, useMemo, useRef } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import api from '../services/config.services';
 import { Link, useNavigate, useParams } from 'react-router';
-
-import Card from '@mui/material/Card';
-import CardContent from '@mui/material/CardContent';
-import CardMedia from '@mui/material/CardMedia';
 import Typography from '@mui/material/Typography';
-import CardActionArea from '@mui/material/CardActionArea';
 import type { ITimeline } from './TimelinesPage';
-import Edit from '@mui/icons-material/Edit';
-import Delete from '@mui/icons-material/Delete';
-import IconButton from '@mui/material/IconButton';
 import Button from '@mui/material/Button';
 import Drawer from '@mui/material/Drawer';
 import ItemForm, { type FormType } from '../components/Forms/ItemForm';
-import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
+import Stack from '@mui/material/Stack';
 import Backdrop from '@mui/material/Backdrop';
 import Modal from '@mui/material/Modal';
 import Fade from '@mui/material/Fade';
@@ -173,19 +165,35 @@ function TimelineItemsPage() {
 
   return (
     <>
-      <main className="relative h-full flex flex-col p-5 gap-10">
+      <main className="relative h-full flex flex-col  py-2 px-5 gap-10">
         <section className="gallery-timeline-items">
-          <Typography variant="h3" component="h2">
-            {timelineDetails?.title}
-          </Typography>
-          <Typography variant="h5" color='' component="h2">
-            {timelineDetails?.description}
-          </Typography>
-          {/* <Grid container spacing={3} sx={{ border: '1px black solid' }}>
+          <Box sx={{
+            display:'flex',
+            justifyContent:'space-between'
+          }}>
+            <Stack>
+              <Typography variant="h4">
+                {timelineDetails?.title.toUpperCase()}
+              </Typography>
+              <Typography variant="h6">
+                {timelineDetails?.description}
+              </Typography>
+            </Stack>
 
-          </Grid> */}
+            <Stack direction={"row"} spacing={2} sx={{ alignItems: 'center'}} >
+              <Box borderRadius={1} 
+                   sx={{ p: 1, display:'flex', alignItems:'center', textAlign:'center', border: '1px solid grey' }}
+              >
+                {`${timelineItems.length} items`}
+              </Box>
 
-          <div className="flex justify-left gap-20 mt-10 lg:flex-row sm:flex-col max-h-[600px] overflow-x-scroll max-w-screen">
+              <AddButton onClick={() => openDrawerCreate('right')} buttonLabel='Add new item' />
+
+            </Stack>
+
+          </Box>
+
+          <div className=" max-w-full flex overflow-x-scroll justify-left gap-10 mt-5 lg:flex-row sm:flex-col max-h-[600px] rounded-md border-1 border-slate-200 p-2 ">
             {timelineItems.map((timelineItem) => (
               <TimelineItemCard
                 timelineItem={timelineItem}
@@ -226,10 +234,8 @@ function TimelineItemsPage() {
           {/* <FleetTimeline items={timelineItems} timelineTitle={timelineDetails?.title} /> */}
           {/* <SimplerTimelineWidget items={newArr} title={timelineDetails?.title ?? 'test'}/> */}
         </section>
-        <AddButton onClick={() => openDrawerCreate('right')} buttonLabel='Add new item' />
-
-
       </main>
+
       <div>
           <Drawer
             anchor={drawerState.position}
@@ -237,6 +243,8 @@ function TimelineItemsPage() {
             onClose={closeDrawer}
             sx={{
               '& .MuiDrawer-paper': {
+                overflowY:'scroll',
+                // minHeight:'1600px',
                 width: { xs: '90%', sm: 500, md: 600 },
               },
             }}
