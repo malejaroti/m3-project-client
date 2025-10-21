@@ -12,8 +12,10 @@ export const FormContainer = styled(Box)(() => ({
     margin: "20px",
     display: "flex",
     flexDirection: "column",
-    gap: "30px"
-
+    gap: "30px",
+    overflowY:'visible',
+    // position: 'fixed',
+    // zIndex: 1000,
 }))
 
 export const FormHeader = styled(Box)(() => ({
