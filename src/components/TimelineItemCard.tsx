@@ -16,13 +16,21 @@ function TimelineItemCard({ timelineItem, callbackOnClickTrash, callbackOnClickE
             weekday: 'short',   // gives Mon, Tue, etc.
             day: '2-digit',
             month: '2-digit',
-            year: 'numeric'
-        }).format(new Date(dateStr));// e.g. "Mon, 07/10/2025"
+            year: '2-digit'
+        }).format(new Date(dateStr));// e.g. "Mon, 07/10/25"
         
         const [weekdayPart, rest] = formatted.split(',', 2);
         if (!rest) return weekdayPart; // fallback
         const weekdayClean = weekdayPart.replace(/\.$/, ''); // avoid double dots
         return `${weekdayClean}. ${rest.trim()}`;
+    }
+    const calculateDays = (startDate?: string, endDate?: string) => {
+        if (!startDate) return 0;
+        const start = new Date(startDate);
+        const end = endDate ? new Date(endDate) : new Date();
+        const diffTime = Math.abs(end.getTime() - start.getTime());
+        const days = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1 // convert to days
+        return days > 1 ? `${days} days` : ``;
     }
 
     return (
@@ -94,29 +102,41 @@ function TimelineItemCard({ timelineItem, callbackOnClickTrash, callbackOnClickE
                 // marginTop:'10px',
                 flexDirection: 'column',
                 alignItems: 'center',
+                maxWidth: '280px',
                 width: '100%',
                 padding:'10px',
-                backgroundColor: timelineItem.images.length === 0 ? '#f5f5f5' : 'transparent',
+                // backgroundColor: timelineItem.images.length === 0 ? '#f5f5f5' : 'transparent',
+                flex: '1 1 auto',
                 // border:1,
             }} className="">
                 <Typography gutterBottom variant="h6" component="div" 
-                sx={{ marginBottom: '0px', textAlign: 'center', lineHeight:'1' }}>
+                sx={{ marginBottom: '2px', textAlign: 'center', lineHeight:'1' }}>
                     {timelineItem.title}
                 </Typography>
                 <Typography variant="body2"
                     sx={{
+                        fontSize: '0.8rem',
                         color: 'text.secondary',
-                        paddingBottom: '8px',
+                        textAlign: 'center',
                     }}>
                     {formatDate(timelineItem.startDate)}
                     {timelineItem.startDate === timelineItem.endDate 
                     ? "" 
                     : timelineItem.endDate
-                        ? ` - ${new Intl.DateTimeFormat('en-GB').format(
-                            new Date(timelineItem.endDate)
-                        )}`
+                        ? ` - ${formatDate(timelineItem.endDate)}
+                          `
                         : ' - Present'
                     }
+                </Typography>
+                <Typography variant="body2"
+                    sx={{
+                        fontSize: '0.8rem',
+                        color: 'text.secondary',
+                        paddingBottom: '8px',
+                        textAlign: 'center',
+                        fontStyle: 'italic',
+                    }}>
+                    {calculateDays(timelineItem.startDate, timelineItem.endDate)} 
                 </Typography>
                 <Typography variant="body2" sx={{
                     color: 'text.secondary',
