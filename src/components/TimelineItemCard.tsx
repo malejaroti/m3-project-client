@@ -30,7 +30,19 @@ function TimelineItemCard({ timelineItem, callbackOnClickTrash, callbackOnClickE
         const end = endDate ? new Date(endDate) : new Date();
         const diffTime = Math.abs(end.getTime() - start.getTime());
         const days = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1 // convert to days
-        return days > 1 ? `${days} days` : ``;
+        const months = Math.floor(days / 30);
+        if (days <= 31) {
+            return days > 1 ? `${days} days` : ``;
+        }
+        return months > 1 ? `${days} days (${months} months)` : ``;
+    }
+
+    const calculateAgeAtDate = (birthDateStr: string, targetDateStr: string) => {
+        const birthDate = new Date(birthDateStr);
+        const targetDate = new Date(targetDateStr);
+        const ageInMilliseconds = targetDate.getTime() - birthDate.getTime();
+        const ageInYears = Math.floor(ageInMilliseconds / (1000 * 60 * 60 * 24 * 365.25));
+        return ageInYears;
     }
 
     return (
@@ -188,6 +200,11 @@ function TimelineItemCard({ timelineItem, callbackOnClickTrash, callbackOnClickE
                     <Delete fontSize="small" />
                 </IconButton>
 
+            </Box>
+            <Box>
+                <Typography variant="body2" sx={{ color: 'text.secondary', position: 'absolute', top: 10, left: 10, fontSize: '0.7rem' }}>
+                    My age: {calculateAgeAtDate("12/16/1997",timelineItem.startDate )} yrs
+                </Typography>
             </Box>
         </Card>
     )
