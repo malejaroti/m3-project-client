@@ -1,19 +1,12 @@
-# React + TypeScript + Vite
-
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
-
-Currently, two official plugins are available:
-
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
 # Timeline Web Application
 
 A modern, full-stack timeline visualization application built with React, TypeScript, and Node.js. Create, manage, and visualize personal timelines with interactive features and a beautiful Material-UI interface.
+
+<div style="display: flex; align-items: center; gap: 12px; margin-bottom: 20px;">
+    <img src="public/public/TimelineApp-Screenshot_Life_timeline.png" alt="Screenshot of Life timeline example" width="40" height="50" />
+   <img src="public/TimelineApp-Screenshot_all_timelines.png" alt="Screenshot of gallery with all timelines " width="40" height="50" />
+   <img src="public/TimelineApp-Screenshot_book_timeline_items.png" alt="Screenshot of timeline items gallery" width="40" height="50" />
+</div>
 
 ## 🚀 Features
 
@@ -206,32 +199,3 @@ This project is part of the Ironhack Web Development Bootcamp - Module 3 Project
 - Material-UI team for the excellent component library
 - vis-timeline for the timeline visualization library
 - All the open-source contributors whose libraries made this project possible
-
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x';
-import reactDom from 'eslint-plugin-react-dom';
-
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-]);
-```
