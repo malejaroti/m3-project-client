@@ -3,9 +3,9 @@
 A modern, full-stack timeline visualization application built with React, TypeScript, and Node.js. Create, manage, and visualize personal timelines with interactive features and a beautiful Material-UI interface.
 
 <div align="center">
-  <img src="public/TimelineApp-Screenshot_Life_timeline.png" alt="Screenshot of Life timeline example" width="50" />
-  <img src="public/TimelineApp-Screenshot_all_timelines.png" alt="Screenshot of gallery with all timelines" width="50" />
-  <img src="public/TimelineApp-Screenshot_book_timeline_items.png" alt="Screenshot of timeline items gallery" width="50" />
+  <img src="public/TimelineApp-Screenshot_Life_timeline.png" alt="Screenshot of Life timeline example" width="300" />
+  <img src="public/TimelineApp-Screenshot_all_timelines.png" alt="Screenshot of gallery with all timelines" width="300" />
+  <img src="public/TimelineApp-Screenshot_book_timeline_items.png" alt="Screenshot of timeline items gallery" width="300" />
 </div>
 
 ## 🚀 Features
